@@ -1,0 +1,64 @@
+plugins {
+    id 'java-library'
+}
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    implementation 'net.java.dev.jna:jna:5.13.0'
+    // Concrete Jackson version released before JDK8, runtime requires the injection of a compatible Jackson implementation
+    // https://mvnrepository.com/artifact/com.fasterxml.jackson.core/jackson-databind
+    api 'com.fasterxml.jackson.core:jackson-databind:2.2.3'
+
+    // Use JUnit Jupiter for testing.
+    testImplementation group: 'com.googlecode.json-simple', name: 'json-simple', version: '1.1.1'
+    testImplementation 'org.junit.jupiter:junit-jupiter:5.9.3'
+    testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
+    testImplementation 'com.fasterxml.jackson.core:jackson-databind:2.2.3'
+    testImplementation 'net.java.dev.jna:jna:5.13.0'
+  }
+
+compileJava {
+    sourceCompatibility = 1.8
+    targetCompatibility = 1.8
+}
+
+jar {
+
+    archiveClassifier = ''
+
+    manifest {
+        attributes 'Implementation-Title': 'Antithesis SDK for Java',
+                'Implementation-Version': "${project.version}",
+                'Created-By': "Gradle ${gradle.gradleVersion}",
+                'Build-Jdk': "${System.properties['java.version']} (${System.properties['java.vendor']} ${System.properties['java.vm.version']})",
+                'Build-OS': "${System.properties['os.name']} ${System.properties['os.arch']} ${System.properties['os.version']}"
+    }
+}
+
+task copyDependencies(type: Copy) {
+    doLast {}
+    from configurations.compileClasspath
+    into 'build/dependencies'
+}
+
+build.finalizedBy(copyDependencies)
+
+java {
+    toolchain {
+        languageVersion = JavaLanguageVersion.of(8)
+    }
+}
+
+test {
+    testLogging {
+        exceptionFormat = 'full'
+        showStandardStreams = true
+    }
+}
+
+tasks.named('test') {
+    useJUnitPlatform()
+}
