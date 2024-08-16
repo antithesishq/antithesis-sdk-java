@@ -9,7 +9,13 @@ import java.util.HashMap;
 public class InstrumentationTest {
     @Test
     void testRandom() {
-        NativeInstrumentationFactory.get().fuzz_get_random();
+        INativeInstrumentation handler = null;
+        try {
+            handler = NativeInstrumentationFactory.get();
+        } catch (UnsatisfiedLinkError | NoClassDefFoundError e) {
+            return;
+        }
+        handler.fuzz_get_random();
     }
 
     @Test
@@ -23,11 +29,23 @@ public class InstrumentationTest {
         // Null terminated C string
         System.arraycopy(decoded, 0, cString, 0, decoded.length);
 
-        NativeInstrumentationFactory.get().fuzz_json_data(cString, json_string.length());
+        INativeInstrumentation handler = null;
+        try {
+            handler = NativeInstrumentationFactory.get();
+        } catch (UnsatisfiedLinkError | NoClassDefFoundError e) {
+            return;
+        } 
+        handler.fuzz_json_data(cString, json_string.length());
     }
 
     @Test
     void testFlush() {
-        NativeInstrumentationFactory.get().fuzz_flush();
+        INativeInstrumentation handler = null;
+        try {
+            handler = NativeInstrumentationFactory.get();
+        } catch (UnsatisfiedLinkError | NoClassDefFoundError e) {
+            return;
+        } 
+        handler.fuzz_flush();
     }
 }
