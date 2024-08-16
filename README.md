@@ -4,7 +4,9 @@
 This has been successfully built on Linux using
 `gradle 8.7`, `groovy 3.0.11` and `openjdk8 8u362-ga`.  
 
-    ./gradlew build -x check
+    # Clean and build
+    ./gradlew clean
+    ./gradlew build
 
     # Build results
     ls -l build/libs/antithesis-sdk-*.jar
