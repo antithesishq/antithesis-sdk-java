@@ -13,7 +13,8 @@ This has been successfully built on Linux using
 
 ### Runtime
 The antithesis SDK for Java will expect the following
-at runtime:
+at runtime. Minimum versions are shown and later versions 
+should work.
 
     jna 5.13.0
     jackson 2.2.3
