@@ -45,6 +45,13 @@ task copyDependencies(type: Copy) {
 }
 build.dependsOn copyDependencies
 
+task generateJavadoc(type: Javadoc) {
+    classpath = sourceSets.main.compileClasspath
+    destinationDir = file("${buildDir}/docs/javadoc")
+    source = sourceSets.main.allJava
+}
+build.dependsOn generateJavadoc
+
 test {
     testLogging {
         exceptionFormat = 'full'

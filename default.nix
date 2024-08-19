@@ -1,5 +1,4 @@
-{ 
-}:
+{ }:
 let
   pkgs = import (builtins.fetchTarball {
     name = "nixos-24.05-release";
@@ -16,39 +15,39 @@ let
     sha256 = "sha256:1viz4jql51dmszmcrxw1cdwcwg9zfmlrvb9z36q7mhb7qc12hcak";
   }) { inherit pkgs; });
 
-  java_sdk =
-    (gradle2nix.buildGradlePackage {
-      pname = "Antithesis Java SDK";
-      version = "1.3.1";
-      lockFile = "${./gradle.lock}";
-      gradleBuildFlags = [ "--quiet" "build" ];
-      buildJdkVersion = pkgs.jdk21;
-    }).overrideAttrs (_: prev: {
-      src =
-        [ ./build.gradle ./settings.gradle ./gradle.properties ./src ];
-      # A custom "unpack" is needed to provide a straightforward src directory with mixed files and subdirectories
-      unpackPhase = ''
-        runHook preUnpack
-        for srcFile in $src; do
-            if [ -d $srcFile ]; then
-                mkdir $(stripHash $srcFile)
-                cp -r $srcFile/* $(stripHash $srcFile)
-            else
-                cp $srcFile $(stripHash $srcFile)
-            fi 
-        done
-        runHook postUnpack
-      '';
+  sdk = (gradle2nix.buildGradlePackage {
+    pname = "Antithesis Java SDK";
+    version = "1.3.1";
+    lockFile = "${./gradle.lock}";
+    gradleBuildFlags = [ "--quiet" "build" ];
+    buildJdkVersion = pkgs.jdk21;
+  }).overrideAttrs (_: prev: {
+    src = [ ./build.gradle ./settings.gradle ./gradle.properties ./src ];
+    # A custom "unpack" is needed to provide a straightforward src directory with mixed files and subdirectories
+    unpackPhase = ''
+      runHook preUnpack
+      for srcFile in $src; do
+          if [ -d $srcFile ]; then
+              mkdir $(stripHash $srcFile)
+              cp -r $srcFile/* $(stripHash $srcFile)
+          else
+              cp $srcFile $(stripHash $srcFile)
+          fi 
+      done
+      runHook postUnpack
+    '';
 
-      installPhase = ''
-        runHook preInstall
-        mkdir -p $out/lib
-        cp --verbose build/{libs,dependencies}/*.jar $out/lib
-        runHook postInstall
-      '';
-    });
+    installPhase = ''
+      runHook preInstall
+      mkdir -p $out/lib
+      cp build/{libs,dependencies}/*.jar $out/lib
+      cp -r build/docs $out/docs
+      runHook postInstall
+    '';
+  });
 in {
-  inherit java_sdk;
+  java_sdk = "${sdk}/lib";
+  docs = "${sdk}/docs";
 
   gradleUpdateScript = pkgs.writeShellScript "generate_gradle_lock_file" ''
     export JAVA_HOME=${pkgs.jdk21}
