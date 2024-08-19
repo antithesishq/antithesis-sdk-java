@@ -40,17 +40,10 @@ jar {
 
 task copyDependencies(type: Copy) {
     doLast {}
-    from configurations.compileClasspath
+    from configurations.runtimeClasspath
     into 'build/dependencies'
 }
-
-build.finalizedBy(copyDependencies)
-
-java {
-    toolchain {
-        languageVersion = JavaLanguageVersion.of(8)
-    }
-}
+build.dependsOn copyDependencies
 
 test {
     testLogging {
