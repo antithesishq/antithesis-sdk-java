@@ -16,7 +16,7 @@ let
     sha256 = "sha256:1viz4jql51dmszmcrxw1cdwcwg9zfmlrvb9z36q7mhb7qc12hcak";
   }) { inherit pkgs; });
 
-  sdk =
+  java_sdk =
     (gradle2nix.buildGradlePackage {
       pname = "Antithesis Java SDK";
       version = "1.3.1";
@@ -42,17 +42,13 @@ let
 
       installPhase = ''
         runHook preInstall
-        find .
         mkdir -p $out/lib
         cp --verbose build/{libs,dependencies}/*.jar $out/lib
-        echo
-        ${pkgs.jdk8}/bin/java -cp $out/lib/'*' com.antithesis.sdk.Instrumentor --version
-        echo
         runHook postInstall
       '';
     });
 in {
-  inherit sdk;
+  inherit java_sdk;
 
   gradleUpdateScript = pkgs.writeShellScript "generate_gradle_lock_file" ''
     export JAVA_HOME=${pkgs.jdk21}
