@@ -1,5 +1,49 @@
 plugins {
     id 'java-library'
+    id 'maven-publish'
+}
+
+publishing {
+    publications {
+        mavenJava(MavenPublication) {
+            pom {
+                name = 'Antithesis SDK for Java'
+                description = 'This library provides methods for Rust programs to configure the Antithesis platform.'
+                url = 'https://antithesis.com/docs/using_antithesis/sdk/java/overview.html'
+
+                licenses {
+                    license {
+                        name = 'MIT License'
+                        url = 'https://choosealicense.com/licenses/mit/'
+                    }
+                }
+
+                developers {
+                    developer {
+                        id = 'Antithesis'
+                        name = 'Antithesis HQ'
+                        email = 'noreply@antithesis.com'
+                    }
+                }
+
+                scm {
+                    connection = 'scm:git:git://github.com/antithesishq/antithesis-sdk-java.git'
+                    developerConnection = 'scm:git:ssh://github.com/antithesishq/antithesis-sdk-java.git'
+                    url = 'https://github.com/antithesishq/antithesis-sdk-java'
+                }
+            }
+        }
+    }
+    repositories {
+        maven {
+            name = "OSSRH"
+            url = "https://oss.sonatype.org/service/local/staging/deploy/maven2/"
+            credentials {
+                username = System.getenv("MAVEN_USERNAME")
+                password = System.getenv("MAVEN_PASSWORD")
+            }
+        }
+    }
 }
 
 repositories {
@@ -59,7 +103,7 @@ task generateJavadoc(type: Javadoc) {
     source = sourceSets.main.allJava
     exclude 'com/antithesis/sdk/internal/**'
 
-    // Hack to enable Javadoc to compile while exclude internal functions
+    // Hack to enable Javadoc to compile while excluding internal functions
     var sourceSetDirectories = sourceSets.main.java.srcDirs.join(":")
     options.addStringOption("sourcepath", sourceSetDirectories)
 
