@@ -40,17 +40,23 @@ jar {
 
 task copyDependencies(type: Copy) {
     doLast {}
-    from configurations.compileClasspath
+    from configurations.runtimeClasspath
     into 'build/dependencies'
 }
+build.dependsOn copyDependencies
 
-build.finalizedBy(copyDependencies)
+task generateJavadoc(type: Javadoc) {
+    source = sourceSets.main.allJava
+    exclude 'com/antithesis/sdk/internal/**'
 
-java {
-    toolchain {
-        languageVersion = JavaLanguageVersion.of(8)
-    }
+    // Hack to enable Javadoc to compile while exclude internal functions
+    var sourceSetDirectories = sourceSets.main.java.srcDirs.join(":")
+    options.addStringOption("-source-path", sourceSetDirectories)
+
+    classpath = sourceSets.main.compileClasspath
+    destinationDir = file("${buildDir}/docs/javadoc")
 }
+build.dependsOn generateJavadoc
 
 test {
     testLogging {
