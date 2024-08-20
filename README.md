@@ -1,5 +1,7 @@
 # Antithesis SDK for Java
 
+## NOTE: This SDK is still under development & is not yet supported
+
 ### Build
 This has been successfully built on Linux using
 `gradle 8.7`, `groovy 3.0.11` and `openjdk8 8u362-ga`.  
