@@ -46,6 +46,7 @@ let
     '';
   });
 in {
+  inherit sdk;
   java_sdk = "${sdk}/lib";
   docs = "${sdk}/docs";
 

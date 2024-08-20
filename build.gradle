@@ -46,9 +46,15 @@ task copyDependencies(type: Copy) {
 build.dependsOn copyDependencies
 
 task generateJavadoc(type: Javadoc) {
+    source = sourceSets.main.allJava
+    exclude 'com/antithesis/sdk/internal/**'
+
+    // Hack to enable Javadoc to compile while exclude internal functions
+    var sourceSetDirectories = sourceSets.main.java.srcDirs.join(":")
+    options.addStringOption("-source-path", sourceSetDirectories)
+
     classpath = sourceSets.main.compileClasspath
     destinationDir = file("${buildDir}/docs/javadoc")
-    source = sourceSets.main.allJava
 }
 build.dependsOn generateJavadoc
 
