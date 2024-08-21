@@ -31,13 +31,20 @@ public class HandlerFactory {
         return theClass != null;
     }
 
-    public static synchronized OutputHandler get() {
+    public static OutputHandler get() {
         if (HANDLER_INSTANCE == null) {
-            HANDLER_INSTANCE = 
-                VoidstarHandler.get().orElseGet(() ->
-                    LocalHandler.get().orElseGet(() ->
-                        NoOpHandler.get().orElseThrow(RuntimeException::new))
-            );
+            HANDLER_INSTANCE = getInternal();
+        }
+        return HANDLER_INSTANCE;
+    }
+
+    private static synchronized OutputHandler getInternal() {
+        if (HANDLER_INSTANCE == null) {
+            HANDLER_INSTANCE =
+                    VoidstarHandler.get().orElseGet(() ->
+                            LocalHandler.get().orElseGet(() ->
+                                    NoOpHandler.get().orElseThrow(RuntimeException::new))
+                    );
         }
         return HANDLER_INSTANCE;
     }
