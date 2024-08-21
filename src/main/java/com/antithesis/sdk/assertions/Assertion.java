@@ -13,6 +13,7 @@ import java.io.IOException;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
+@lombok.Builder @lombok.AllArgsConstructor
 final class Assertion {
 
     private static final LocationInfo NoInfo = new LocationInfo(
@@ -23,7 +24,7 @@ final class Assertion {
         int failCount = 0;
         LocationInfo locInfo;
 
-        public TrackingInfo(LocationInfo locInfo) {
+        public TrackingInfo(final LocationInfo locInfo) {
             this.locInfo = locInfo;
         }
 
@@ -35,7 +36,7 @@ final class Assertion {
             this.failCount++;
         }
 
-        protected void setLocationInfo(LocationInfo locInfo) {
+        protected void setLocationInfo(final LocationInfo locInfo) {
             this.locInfo = locInfo;
         }
 
@@ -64,7 +65,7 @@ final class Assertion {
         MAPPER = mapper;
     }
 
-    private enum AssertType {
+    public enum AssertType {
         Always, Sometimes, Reachability, Unknown
     }
 
@@ -95,95 +96,7 @@ final class Assertion {
     @JsonProperty("details")
     final private ObjectNode details;
 
-    // ----------------------------------------------------------------------
-    // Used for normal runtime calls
-    // ----------------------------------------------------------------------
-    Assertion(final String assertType, String displayType, final boolean condition, final String message, final ObjectNode details, final boolean hit, boolean mustHit) {
-
-        // LocationInfo is only available through previously seen rawAssert()
-        // invocations which use the alternate Assertion instance constructor
-        // shown below.  There is no attempt to derive LocationInfo programmatically
-        // at runtime.
-
-        AssertType userAssertType;
-
-        switch (assertType) {
-            case "always":
-                userAssertType = AssertType.Always;
-                break;
-            case "sometimes":
-                userAssertType = AssertType.Sometimes;
-                break;
-            case "reachability":
-                userAssertType = AssertType.Reachability;
-                break;
-            default:
-                userAssertType = AssertType.Unknown;
-                break;
-        }
-
-        this.assertType = userAssertType;
-        this.displayType = displayType;
-        this.location = getLocationInfo(message);
-        this.id = message;
-        this.condition = condition;
-        this.message = message;
-        this.details = details;
-        this.hit = hit;
-        this.mustHit = mustHit;
-
-        this.trackEntry();
-    }
-
-    // ----------------------------------------------------------------------
-    // Used for registration and DIY'ers
-    // ----------------------------------------------------------------------
-    Assertion(
-        String assertType,
-        String displayType,
-        String className,
-        String functionName,
-        String fileName,
-        int begin_line,
-        int begin_column,
-        String id,
-        boolean condition,
-        String message, 
-        ObjectNode details, // TODO: something in Java 8 that is better?
-        boolean hit,
-        boolean mustHit
-    ) {
-        AssertType userAssertType;
-
-        switch (assertType) {
-            case "always":
-                userAssertType = AssertType.Always;
-                break;
-            case "sometimes":
-                userAssertType = AssertType.Sometimes;
-                break;
-            case "reachability":
-                userAssertType = AssertType.Reachability;
-                break;
-            default:
-                userAssertType = AssertType.Unknown;
-                break;
-        }
-
-        this.assertType = userAssertType;
-        this.displayType = displayType;
-        this.location = new LocationInfo(className, functionName, fileName, begin_line, begin_column);
-        this.id = id;
-        this.message = message;
-        this.details = details;
-        this.condition = condition;
-        this.hit = hit;
-        this.mustHit = mustHit;
-
-        this.trackEntry();
-    }
-
-    private LocationInfo getLocationInfo(String id) {
+    public static LocationInfo getLocationInfo(final String id) {
         TrackingInfo maybeTrackingInfo = TRACKER.get(id);
         if (maybeTrackingInfo == null) {
             return NoInfo;
@@ -191,7 +104,7 @@ final class Assertion {
         return maybeTrackingInfo.getLocationInfo();
     }
 
-    private void trackEntry() {
+    public void trackEntry() {
         // Requirement: Catalog entries must always will emit()
         if (!this.hit) {
             if (!TRACKER.containsKey(this.id)) {
