@@ -1,8 +1,28 @@
 package com.antithesis.sdk.assertions;
 
+import com.antithesis.sdk.internal.Assertion;
+import com.antithesis.sdk.internal.LocationInfo;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
 final public class Assertions {
+
+    /**
+     * Types of assertions available
+     */
+    public enum AssertType {
+        /**
+         * Condition must always be true
+         */
+        Always,
+        /**
+         * Condition must be true at least once
+         */
+        Sometimes,
+        /**
+         * Indicates if an assertion should be encountered
+         */
+        Reachability
+    }
 
     /**
      * Assert that <code>condition</code> is true every time this function is called, <i>and</i> that it is
@@ -14,7 +34,7 @@ final public class Assertions {
      */
     public static void always(final boolean condition, final String message, final ObjectNode details) {
         Assertion.builder()
-                .assertType(Assertion.AssertType.Always)
+                .assertType(AssertType.Always)
                 .condition(condition)
                 .details(details)
                 .displayType("Always")
@@ -39,7 +59,7 @@ final public class Assertions {
      */
     public static void alwaysOrUnreachable(final boolean condition, final String message, final ObjectNode details) {
         Assertion.builder()
-                .assertType(Assertion.AssertType.Always)
+                .assertType(AssertType.Always)
                 .condition(condition)
                 .details(details)
                 .displayType("AlwaysOrUnreachable")
@@ -63,7 +83,7 @@ final public class Assertions {
      */
     public static void sometimes(final boolean condition, final String message, final ObjectNode details) {
         Assertion.builder()
-                .assertType(Assertion.AssertType.Sometimes)
+                .assertType(AssertType.Sometimes)
                 .condition(condition)
                 .details(details)
                 .displayType("Sometimes")
@@ -87,7 +107,7 @@ final public class Assertions {
      */
     public static void unreachable(final String message, final ObjectNode details) {
         Assertion.builder()
-                .assertType(Assertion.AssertType.Reachability)
+                .assertType(AssertType.Reachability)
                 .condition(false)
                 .details(details)
                 .displayType("Unreachable")
@@ -111,7 +131,7 @@ final public class Assertions {
      */
     public static void reachable(final String message, final ObjectNode details) {
         Assertion.builder()
-                .assertType(Assertion.AssertType.Reachability)
+                .assertType(AssertType.Reachability)
                 .condition(true)
                 .details(details)
                 .displayType("Reachable")
@@ -156,7 +176,7 @@ final public class Assertions {
      * @param mustHit      true if the assertion is expected to be evaluated at least once, otherwise false
      */
     public static void rawAssert(
-            final Assertion.AssertType assertType,
+            final AssertType assertType,
             final String displayType,
             final String className,
             final String functionName,
@@ -190,5 +210,5 @@ final public class Assertions {
                 .mustHit(mustHit)
                 .build()
                 .trackEntry();
-    } 
+    }
 }

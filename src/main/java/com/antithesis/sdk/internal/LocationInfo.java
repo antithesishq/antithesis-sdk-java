@@ -1,9 +1,9 @@
-package com.antithesis.sdk.assertions;
+package com.antithesis.sdk.internal;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 @lombok.Builder @lombok.AllArgsConstructor
-class LocationInfo {
+public class LocationInfo {
     @JsonProperty("class")
     private String className;
 

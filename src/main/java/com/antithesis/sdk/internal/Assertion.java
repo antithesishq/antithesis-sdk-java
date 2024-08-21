@@ -1,6 +1,6 @@
-package com.antithesis.sdk.assertions;
+package com.antithesis.sdk.internal;
 
-import com.antithesis.sdk.internal.Internal;
+import com.antithesis.sdk.assertions.Assertions;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.core.JsonGenerator;
 import com.fasterxml.jackson.databind.JsonSerializer;
@@ -14,7 +14,7 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
 @lombok.Builder @lombok.AllArgsConstructor
-final class Assertion {
+public final class Assertion {
 
     private static final LocationInfo NoInfo = new LocationInfo(
       "class", "function", "file", 0, 0);
@@ -49,9 +49,9 @@ final class Assertion {
     private static final ObjectMapper MAPPER;
 
     static {
-        class LowercaseEnumSerializer extends JsonSerializer<AssertType> {
+        class LowercaseEnumSerializer extends JsonSerializer<Assertions.AssertType> {
             @Override
-            public void serialize(AssertType value, JsonGenerator jsonGen, SerializerProvider provider) throws IOException {
+            public void serialize(Assertions.AssertType value, JsonGenerator jsonGen, SerializerProvider provider) throws IOException {
                 jsonGen.writeString(value.name().toLowerCase());
             }
         }
@@ -59,18 +59,14 @@ final class Assertion {
         ObjectMapper mapper = new ObjectMapper();
 
         SimpleModule module = new SimpleModule();
-        module.addSerializer(AssertType.class, new LowercaseEnumSerializer());
+        module.addSerializer(Assertions.AssertType.class, new LowercaseEnumSerializer());
         mapper.registerModule(module);
 
         MAPPER = mapper;
     }
 
-    public enum AssertType {
-        Always, Sometimes, Reachability, Unknown
-    }
-
     @JsonProperty("assert_type")
-    final private AssertType assertType;
+    final private Assertions.AssertType assertType;
 
     @JsonProperty("display_type")
     final private String displayType;
