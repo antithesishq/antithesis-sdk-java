@@ -1,5 +1,4 @@
 package com.antithesis.sdk.internal;
-// [WAS] package com.antithesis.instrumentation;
 
 /**
  * JNA will create bindings to libvoidstar.so based on

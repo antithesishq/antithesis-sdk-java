@@ -1,5 +1,4 @@
 package com.antithesis.sdk.internal;
-// [WAS] package com.antithesis.instrumentation;
 
 import com.sun.jna.Library;
 import com.sun.jna.Native;
@@ -41,12 +40,9 @@ public final class NativeInstrumentationFactory {
             nativeInterface = Native.load(NATIVE_LIBRARY_NAME, AntithesisInstrumentationLibrary.class);
         } catch (UnsatisfiedLinkError error) {
             // load() throws an UnsatisfiedLinkError if it can't find the native library
-            // logger.log(Level.SEVERE, "Could not find " + NATIVE_LIBRARY_NAME, error);
             logger.log(Level.INFO, "Could not find " + NATIVE_LIBRARY_NAME);
             throw error;
-        // TODO (@shomik) Explicitly handle NoClassDefFoundError to facilitate using JNA as a compileOnly dep and providing a concrete implementation at jar runtime
         } catch (Throwable t) {
-            // logger.log(Level.SEVERE, "Could not find " + NATIVE_LIBRARY_NAME, t);
             logger.log(Level.INFO, "Could not find " + NATIVE_LIBRARY_NAME);
             throw new RuntimeException(t);
         }
