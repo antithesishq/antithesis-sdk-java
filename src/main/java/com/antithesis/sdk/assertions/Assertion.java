@@ -102,19 +102,24 @@ final class Assertion {
 
         // LocationInfo is only available through previously seen rawAssert()
         // invocations which use the alternate Assertion instance constructor
-        // shown below.  There is no attempt to derive LocationInfo programatically
+        // shown below.  There is no attempt to derive LocationInfo programmatically
         // at runtime.
 
         AssertType userAssertType;
 
-        if (assertType.equals("always")) {
-            userAssertType = Assertion.AssertType.Always;
-        } else if (assertType.equals("sometimes")) {
-            userAssertType = Assertion.AssertType.Sometimes;
-        } else if (assertType.equals("reachability")) {
-            userAssertType = Assertion.AssertType.Reachability;
-        } else {
-            userAssertType = Assertion.AssertType.Unknown;
+        switch (assertType) {
+            case "always":
+                userAssertType = AssertType.Always;
+                break;
+            case "sometimes":
+                userAssertType = AssertType.Sometimes;
+                break;
+            case "reachability":
+                userAssertType = AssertType.Reachability;
+                break;
+            default:
+                userAssertType = AssertType.Unknown;
+                break;
         }
 
         this.assertType = userAssertType;
@@ -150,14 +155,19 @@ final class Assertion {
     ) {
         AssertType userAssertType;
 
-        if (assertType.equals("always")) {
-            userAssertType = Assertion.AssertType.Always;
-        } else if (assertType.equals("sometimes")) {
-            userAssertType = Assertion.AssertType.Sometimes;
-        } else if (assertType.equals("reachability")) {
-            userAssertType = Assertion.AssertType.Reachability;
-        } else {
-            userAssertType = Assertion.AssertType.Unknown;
+        switch (assertType) {
+            case "always":
+                userAssertType = AssertType.Always;
+                break;
+            case "sometimes":
+                userAssertType = AssertType.Sometimes;
+                break;
+            case "reachability":
+                userAssertType = AssertType.Reachability;
+                break;
+            default:
+                userAssertType = AssertType.Unknown;
+                break;
         }
 
         this.assertType = userAssertType;
