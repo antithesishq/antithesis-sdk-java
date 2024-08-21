@@ -25,6 +25,20 @@ compileJava {
     targetCompatibility = 1.8
 }
 
+task buildVoidstarBridge(type: Exec) {
+    workingDir projectDir
+
+    commandLine 'make', '-C', 'swig', 'build'
+}
+compileJava.dependsOn buildVoidstarBridge
+
+task cleanVoidstarBridge(type: Exec) {
+    workingDir projectDir
+
+    commandLine 'make', '-C', 'swig', 'clean'
+}
+clean.dependsOn cleanVoidstarBridge
+
 jar {
 
     archiveClassifier = ''
@@ -51,7 +65,7 @@ task generateJavadoc(type: Javadoc) {
 
     // Hack to enable Javadoc to compile while exclude internal functions
     var sourceSetDirectories = sourceSets.main.java.srcDirs.join(":")
-    options.addStringOption("-source-path", sourceSetDirectories)
+    options.addStringOption("sourcepath", sourceSetDirectories)
 
     classpath = sourceSets.main.compileClasspath
     destinationDir = file("${buildDir}/docs/javadoc")
@@ -59,6 +73,8 @@ task generateJavadoc(type: Javadoc) {
 build.dependsOn generateJavadoc
 
 test {
+    // environment 'LD_LIBRARY_PATH', "${projectDir}/swig"
+    systemProperty 'java.library.path', "${projectDir}/swig"
     testLogging {
         exceptionFormat = 'full'
         showStandardStreams = true
