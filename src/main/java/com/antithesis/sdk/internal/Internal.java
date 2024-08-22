@@ -7,16 +7,15 @@ import java.io.IOException;
 
 final public class Internal {
 
+    private static final ObjectMapper MAPPER = new ObjectMapper();
+
     public static long dispatchRandom() {
         return HandlerFactory.get().random();
     }
 
     public static void dispatchOutput(final ObjectNode s) {
         try {
-            // TODO (@shomik) verify jsonL format
-            // TODO (@shomik) Explicitly handle NoClassDefFoundError to facilitate using Jackson as a compileOnly dep and providing a concrete implementation at jar runtime
-            String jsonStr = new ObjectMapper().writeValueAsString(s);
-
+            String jsonStr = MAPPER.writeValueAsString(s);
             HandlerFactory.get().output(jsonStr);
         } catch (IOException e) {
             // TODO (@shomik) logging

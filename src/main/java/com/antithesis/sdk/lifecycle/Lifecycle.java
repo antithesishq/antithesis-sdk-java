@@ -22,12 +22,12 @@ final public class Lifecycle {
     public static void setupComplete(final ObjectNode details) {
         ObjectMapper mapper = new ObjectMapper();
 
-        ObjectNode antithesis_setup = mapper.createObjectNode();
-        antithesis_setup.put("status", "complete");
-        antithesis_setup.put("details", details);
+        ObjectNode antithesisSetup = mapper.createObjectNode();
+        antithesisSetup.put("status", "complete");
+        antithesisSetup.put("details", details);
 
         ObjectNode setup_complete_data = mapper.createObjectNode();
-        setup_complete_data.put("antithesis_setup", antithesis_setup);
+        setup_complete_data.put("antithesis_setup", antithesisSetup);
 
         Internal.dispatchOutput(setup_complete_data);
     }
@@ -48,12 +48,11 @@ final public class Lifecycle {
             name = "anonymous";
         }
 
-
         ObjectMapper mapper = new ObjectMapper();
-        ObjectNode json_event = mapper.createObjectNode();
-        json_event.put(name, details);
+        ObjectNode eventJson = mapper.createObjectNode();
+        eventJson.put(name, details);
 
-        Internal.dispatchOutput(json_event);
+        Internal.dispatchOutput(eventJson);
     }
 
 }

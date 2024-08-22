@@ -81,9 +81,6 @@ public class HandlerFactory {
 
         private LocalHandler(final String fileName) {
             this.outFile = new File(fileName);
-            if (this.outFile == null) {
-                System.out.printf("Unable to access \"%s\" for assertion output\n", fileName);
-            }
             String fullPath;
             try {
                 fullPath = this.outFile.getAbsolutePath();
