@@ -9,7 +9,7 @@ import java.util.Random;
 public class HandlerFactory {
 
     // Will be initialized through the static 'HandlerFactory.get()' function
-    private static OutputHandler HANDLER_INSTANCE =  null;
+    private static OutputHandler HANDLER_INSTANCE = null;
 
     private final static boolean CATALOG_SENT = didLoadCatalog();
 

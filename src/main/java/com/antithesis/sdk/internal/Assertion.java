@@ -13,11 +13,12 @@ import java.io.IOException;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
-@lombok.Builder @lombok.AllArgsConstructor
+@lombok.Builder
+@lombok.AllArgsConstructor
 public final class Assertion {
 
     private static final LocationInfo NoInfo = new LocationInfo(
-      "class", "function", "file", 0, 0);
+            "class", "function", "file", 0, 0);
 
     private static class TrackingInfo {
         int passCount = 0;
@@ -104,7 +105,7 @@ public final class Assertion {
         // Requirement: Catalog entries must always will emit()
         if (!this.hit) {
             if (!TRACKER.containsKey(this.id)) {
-               TRACKER.put(this.id, new TrackingInfo(this.location));
+                TRACKER.put(this.id, new TrackingInfo(this.location));
             }
             this.emit();
             return;

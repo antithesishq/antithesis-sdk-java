@@ -142,7 +142,7 @@ final public class Assertions {
                 .mustHit(true)
                 .build()
                 .trackEntry();
-     }
+    }
 
     /**
      * This is a low-level method designed to be used by third-party frameworks.
@@ -166,8 +166,8 @@ final public class Assertions {
      * @param className    the name of the package and class containing this assertion
      * @param functionName the name of the method containing this assertion
      * @param fileName     the name of the source file containing this assertion
-     * @param beginLine   the source line number where the assertion is located
-     * @param beginColumn the source column number where the assertion is located
+     * @param beginLine    the source line number where the assertion is located
+     * @param beginColumn  the source column number where the assertion is located
      * @param id           the unique text associated with the assertion
      * @param condition    the result of evaluating the assertion at runtime
      * @param message      the unique text associated with the assertion
