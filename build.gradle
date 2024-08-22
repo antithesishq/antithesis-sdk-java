@@ -79,7 +79,6 @@ task generateJavadoc(type: Javadoc) {
 build.dependsOn generateJavadoc
 
 test {
-    // environment 'LD_LIBRARY_PATH', "${projectDir}/swig"
     systemProperty 'java.library.path', "${projectDir}/swig"
     testLogging {
         exceptionFormat = 'full'
