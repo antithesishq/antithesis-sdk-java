@@ -1,6 +1,26 @@
 %module VoidstarWrapper
+// %{
+// #include "sdk.h"
+// %}
+
 %{
-#include "instrumentation.h"
+#include <stddef.h>
+#include <stdint.h>
+#include <stdbool.h>
+
+#ifdef __cplusplus
+extern "C" {
+#endif
+
+uint64_t fuzz_get_random();
+void fuzz_json_data( const char* message, size_t length );
+void fuzz_flush();
+size_t init_coverage_module(size_t edge_count, const char* symbol_file_name);
+bool notify_coverage(size_t edge_plus_module);
+
+#ifdef __cplusplus
+}
+#endif
 %}
 
 %pragma(java) jniclassimports=%{
@@ -34,4 +54,4 @@ unsigned long fuzz_get_random();
 void fuzz_json_data( const char* message, size_t length );
 void fuzz_flush();
 size_t init_coverage_module(size_t edgeCount, const char* symbolFilePath);
-void notify_coverage(size_t edgePlusModule);
+bool notify_coverage(size_t edgePlusModule);
