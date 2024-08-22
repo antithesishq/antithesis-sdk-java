@@ -3,7 +3,7 @@ build:
 	swig -java -package com.antithesis.sdk.internal VoidstarWrapper.i
 
   # Copy the generated java files to the internal package
-	cp *.java ../src/main/java/com/antithesis/sdk/internal
+	cp VoidstarWrapperJNI.java ../src/main/java/com/antithesis/sdk/internal
 
 	# Create the wrapper DSO used by JNI to access libvoidstar
 	${CC} -I"${JAVA_HOME}\include" -I . -shared -o libVoidstarWrapper.so *.c

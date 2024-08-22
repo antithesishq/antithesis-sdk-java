@@ -28,20 +28,33 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
 %}
 
 %pragma(java) jniclasscode=%{
-    static void loadLibrary() throws IOException {
+
+
+    private static final String NATIVE_LIBRARY_PATH = "/usr/lib/libvoidstar.so";
+
+    public static boolean hasNativeLibrary() {
+       return Files.exists(Paths.get(NATIVE_LIBRARY_PATH));
+    }
+
+    public static void loadLibrary() throws IOException {
         try {
-            System.load("/usr/lib/libvoidstar.so");
-            File file = File.createTempFile("libVoidstarWrapper", ".so");
-            try (InputStream link = (Thread.currentThread().getContextClassLoader().getResourceAsStream("libVoidstarWrapper.so"))){
-                Files.copy(
-                    link,
-                    file.getAbsoluteFile().toPath(),
-                    StandardCopyOption.REPLACE_EXISTING);
-                System.load(file.getAbsoluteFile().toString());
+            if (hasNativeLibrary()) {
+                System.load(NATIVE_LIBRARY_PATH);
+                File file = File.createTempFile("libVoidstarWrapper", ".so");
+                try (InputStream link = (Thread.currentThread().getContextClassLoader().getResourceAsStream("libVoidstarWrapper.so"))){
+                    Files.copy(
+                        link,
+                        file.getAbsoluteFile().toPath(),
+                        StandardCopyOption.REPLACE_EXISTING);
+                    System.load(file.getAbsoluteFile().toString());
+                }
+            } else {
+                throw new RuntimeException("Native code library failed to load");
             }
         } catch (UnsatisfiedLinkError e) {
             System.err.println("Native code library failed to load. \n" + e);
