@@ -18,7 +18,13 @@ dependencies {
     testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
     testImplementation 'com.fasterxml.jackson.core:jackson-databind:2.2.3'
     testImplementation 'net.java.dev.jna:jna:5.13.0'
-  }
+
+    compileOnly 'org.projectlombok:lombok:1.18.34'
+    annotationProcessor 'org.projectlombok:lombok:1.18.34'
+
+    testCompileOnly 'org.projectlombok:lombok:1.18.34'
+    testAnnotationProcessor 'org.projectlombok:lombok:1.18.34'
+}
 
 compileJava {
     sourceCompatibility = 1.8

@@ -11,13 +11,13 @@ final public class Lifecycle {
      * your system and workload are fully initialized.
      * After this function is called, Antithesis will take a snapshot of your system
      * and begin <a href="https://antithesis.com/docs/applications/reliability/fault_injection.html" target="_blank">injecting faults</a>.
-     *
+     * <p>
      * Calling this function multiple times or from multiple processes will have no effect.
-     * Antithesis will treat the first time any process called this function as 
+     * Antithesis will treat the first time any process called this function as
      * the moment that the setup was completed.
      *
-     * @param details additional values describing the program state 
-     * when the setupComplete was evaluated
+     * @param details additional values describing the program state
+     *                when the setupComplete was evaluated
      */
     public static void setupComplete(final ObjectNode details) {
         ObjectMapper mapper = new ObjectMapper();
@@ -33,10 +33,10 @@ final public class Lifecycle {
     }
 
     /**
-     * Indicates to Antithesis that a certain event has been reached. It sends a 
+     * Indicates to Antithesis that a certain event has been reached. It sends a
      * structured log message to Antithesis that you may later use to aid debugging.
-     *
-     * In addition to <code>details</code>, you also provide <code>rawName</code>, 
+     * <p>
+     * In addition to <code>details</code>, you also provide <code>rawName</code>,
      * which is the name of the event that you are logging.
      *
      * @param rawName the name of the event that is being logged
