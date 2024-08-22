@@ -51,11 +51,4 @@ public class VoidstarHandler implements OutputHandler {
         VoidstarWrapperJNI.notify_coverage(edgePlusModule);
     }
 
-    // [DEL] static private byte[] createNativeString(String s) {
-    // [DEL]     byte[] decoded = s.getBytes(StandardCharsets.UTF_8);
-    // [DEL]     byte[] cstring = new byte[decoded.length + 1];
-    // [DEL]     // null-terminate the string...it's C!
-    // [DEL]     System.arraycopy(decoded, 0, cstring, 0, decoded.length);
-    // [DEL]     return cstring;
-    // [DEL] }
 }
