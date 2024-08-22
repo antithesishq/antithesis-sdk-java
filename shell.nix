@@ -5,5 +5,7 @@ pkgs.mkShell {
       pkgs.gradle
       pkgs.groovy
       pkgs.jdk8
+      pkgs.swig
+      pkgs.patchelf
   ];
 }

@@ -1,51 +1,56 @@
 package com.antithesis.sdk.internal;
 
 import org.junit.jupiter.api.Test;
-import org.json.simple.JSONObject;
+import static org.junit.jupiter.api.Assertions.fail;
+import static org.junit.jupiter.api.Assumptions.assumeTrue;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ObjectNode;
+import com.fasterxml.jackson.core.JsonProcessingException;
 
-import java.nio.charset.StandardCharsets;
-import java.util.HashMap;
+
 
 public class InstrumentationTest {
     @Test
     void testRandom() {
-        INativeInstrumentation handler = null;
+        assumeTrue(VoidstarWrapperJNI.hasNativeLibrary());
         try {
-            handler = NativeInstrumentationFactory.get();
-        } catch (UnsatisfiedLinkError | NoClassDefFoundError e) {
-            return;
+             VoidstarWrapperJNI.loadLibrary();
+        } catch (Throwable e) {
+            fail("Unable to load native library");
         }
-        handler.fuzz_get_random();
+        VoidstarWrapperJNI.fuzz_get_random();
     }
 
     @Test
     void testJsonData() {
-        HashMap<String, String> map = new HashMap<>();
-        map.put("hello", "world");
-        String json_string = new JSONObject(map).toJSONString();
+        assumeTrue(VoidstarWrapperJNI.hasNativeLibrary());
 
-        byte[] decoded = json_string.getBytes(StandardCharsets.UTF_8);
-        byte[] cString = new byte[decoded.length + 1];
-        // Null terminated C string
-        System.arraycopy(decoded, 0, cString, 0, decoded.length);
+        ObjectMapper mapper = new ObjectMapper();
+        ObjectNode jsonNode = mapper.createObjectNode();
+        jsonNode.put("hello", "world");
 
-        INativeInstrumentation handler = null;
         try {
-            handler = NativeInstrumentationFactory.get();
-        } catch (UnsatisfiedLinkError | NoClassDefFoundError e) {
-            return;
+             VoidstarWrapperJNI.loadLibrary();
+        } catch (Throwable e) {
+            fail("Unable to load native library");
         } 
-        handler.fuzz_json_data(cString, json_string.length());
+        String theString = "";
+        try {
+            theString = mapper.writeValueAsString(jsonNode);
+        } catch (JsonProcessingException e) {
+            fail(e.getMessage());
+        }
+        VoidstarWrapperJNI.fuzz_json_data(theString, theString.length());
     }
 
     @Test
     void testFlush() {
-        INativeInstrumentation handler = null;
+        assumeTrue(VoidstarWrapperJNI.hasNativeLibrary());
         try {
-            handler = NativeInstrumentationFactory.get();
-        } catch (UnsatisfiedLinkError | NoClassDefFoundError e) {
-            return;
+             VoidstarWrapperJNI.loadLibrary();
+        } catch (Throwable e) {
+            fail("Unable to load native library");
         } 
-        handler.fuzz_flush();
+        VoidstarWrapperJNI.fuzz_flush();
     }
 }

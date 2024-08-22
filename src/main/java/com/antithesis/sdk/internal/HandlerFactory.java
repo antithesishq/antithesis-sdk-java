@@ -25,8 +25,9 @@ public class HandlerFactory {
         try {
             theClass = Class.forName(className, shouldInitialize, classLoader);
         } catch (Throwable e) {
-            System.out.printf("HandlerFactory.didLoadCatalog() unable to load using Class.forName(\"%s\", %b, classLoader)\n", className, shouldInitialize);
-            System.out.printf("Caught: %s\n", e.toString());
+            // TODO: (@shomik) Consider logging this
+            // System.out.printf("HandlerFactory.didLoadCatalog() unable to load using Class.forName(\"%s\", %b, classLoader)\n", className, shouldInitialize);
+            // System.out.printf("Caught: %s\n", e.toString());
         }
         return theClass != null;
     }
