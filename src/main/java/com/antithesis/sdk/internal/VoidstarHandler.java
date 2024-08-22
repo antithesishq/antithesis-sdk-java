@@ -17,6 +17,7 @@ public class VoidstarHandler implements OutputHandler {
     private VoidstarHandler(final INativeInstrumentation instrumentation) {
         NATIVE_VOIDSTAR = instrumentation;
     }
+
     public static Optional<OutputHandler> get() {
         try {
             return Optional.of(new VoidstarHandler(NativeInstrumentationFactory.get()));

@@ -18,7 +18,13 @@ dependencies {
     testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
     testImplementation 'com.fasterxml.jackson.core:jackson-databind:2.2.3'
     testImplementation 'net.java.dev.jna:jna:5.13.0'
-  }
+
+    compileOnly 'org.projectlombok:lombok:1.18.34'
+    annotationProcessor 'org.projectlombok:lombok:1.18.34'
+
+    testCompileOnly 'org.projectlombok:lombok:1.18.34'
+    testAnnotationProcessor 'org.projectlombok:lombok:1.18.34'
+}
 
 compileJava {
     sourceCompatibility = 1.8
@@ -51,7 +57,7 @@ task generateJavadoc(type: Javadoc) {
 
     // Hack to enable Javadoc to compile while exclude internal functions
     var sourceSetDirectories = sourceSets.main.java.srcDirs.join(":")
-    options.addStringOption("-source-path", sourceSetDirectories)
+    options.addStringOption("sourcepath", sourceSetDirectories)
 
     classpath = sourceSets.main.compileClasspath
     destinationDir = file("${buildDir}/docs/javadoc")

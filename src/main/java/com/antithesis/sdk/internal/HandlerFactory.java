@@ -9,7 +9,7 @@ import java.util.Random;
 public class HandlerFactory {
 
     // Will be initialized through the static 'HandlerFactory.get()' function
-    private static OutputHandler HANDLER_INSTANCE =  null;
+    private static OutputHandler HANDLER_INSTANCE = null;
 
     private final static boolean CATALOG_SENT = didLoadCatalog();
 
@@ -31,13 +31,20 @@ public class HandlerFactory {
         return theClass != null;
     }
 
-    public static synchronized OutputHandler get() {
+    public static OutputHandler get() {
         if (HANDLER_INSTANCE == null) {
-            HANDLER_INSTANCE = 
-                VoidstarHandler.get().orElseGet(() ->
-                    LocalHandler.get().orElseGet(() ->
-                        NoOpHandler.get().orElseThrow(RuntimeException::new))
-            );
+            HANDLER_INSTANCE = getInternal();
+        }
+        return HANDLER_INSTANCE;
+    }
+
+    private static synchronized OutputHandler getInternal() {
+        if (HANDLER_INSTANCE == null) {
+            HANDLER_INSTANCE =
+                    VoidstarHandler.get().orElseGet(() ->
+                            LocalHandler.get().orElseGet(() ->
+                                    NoOpHandler.get().orElseThrow(RuntimeException::new))
+                    );
         }
         return HANDLER_INSTANCE;
     }
