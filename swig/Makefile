@@ -12,7 +12,7 @@ build:
 	# ldd will fail to resolve this outside of the Antithesis runtime environment
 	# libVoidstarWrapper is only loaded if libvoidstar is successfully
 	# loaded first.
-	patchelf --add-needed libvoidstar.so ./libVoidstarWrapper.so
+	patchelf --add-needed /usr/lib/libvoidstar.so ./libVoidstarWrapper.so
 
 	# Move the wrapper into a folder so it can be added into the target jar
 	mkdir -p ../src/main/resources
