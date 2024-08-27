@@ -20,18 +20,13 @@ public class HandlerFactory {
         String className = "com.antithesis.sdk.generated.AssertionCatalog";
         ClassLoader classLoader = Thread.currentThread().getContextClassLoader();
         if (classLoader == null) {
-            System.out.println("HandlerFactory.didLoadCatalog() could not obtain a ClassLoader");
             return false;
         }
         Class theClass = null;
         boolean shouldInitialize = true;
         try {
             theClass = Class.forName(className, shouldInitialize, classLoader);
-        } catch (Throwable e) {
-            // TODO: (@shomik) Consider logging this
-            // System.out.printf("HandlerFactory.didLoadCatalog() unable to load using Class.forName(\"%s\", %b, classLoader)\n", className, shouldInitialize);
-            // System.out.printf("Caught: %s\n", e.toString());
-        }
+        } catch (Throwable ignored) {}
         return theClass != null;
     }
 
