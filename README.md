@@ -11,13 +11,13 @@ This has been successfully built on Linux using
     ./gradlew build
 
     # Build results
-    ls -l build/libs/antithesis-sdk-*.jar
+    ls -l build/libs/antithesis-sdk-*.jar build/libs/antithesis-ffi-*.jar
 
 ### Runtime
 The antithesis SDK for Java will expect the following
 at runtime. Minimum versions are shown and later versions 
 should work.
 
-    jna 5.13.0
-    jackson 2.2.3
+    antithesis-ffi 1.3.1 (or above)
+    jackson 2.2.3 (or above)
 
