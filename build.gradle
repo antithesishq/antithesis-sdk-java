@@ -1,91 +1,17 @@
-plugins {
-    id 'java-library'
-}
-
-repositories {
-    mavenCentral()
-}
-
-dependencies {
-    implementation 'net.java.dev.jna:jna:5.13.0'
-    // Concrete Jackson version released before JDK8, runtime requires the injection of a compatible Jackson implementation
-    // https://mvnrepository.com/artifact/com.fasterxml.jackson.core/jackson-databind
-    api 'com.fasterxml.jackson.core:jackson-databind:2.2.3'
-
-    // Use JUnit Jupiter for testing.
-    testImplementation group: 'com.googlecode.json-simple', name: 'json-simple', version: '1.1.1'
-    testImplementation 'org.junit.jupiter:junit-jupiter:5.9.3'
-    testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
-    testImplementation 'com.fasterxml.jackson.core:jackson-databind:2.2.3'
-    testImplementation 'net.java.dev.jna:jna:5.13.0'
-
-    compileOnly 'org.projectlombok:lombok:1.18.34'
-    annotationProcessor 'org.projectlombok:lombok:1.18.34'
-
-    testCompileOnly 'org.projectlombok:lombok:1.18.34'
-    testAnnotationProcessor 'org.projectlombok:lombok:1.18.34'
-}
-
-compileJava {
-    sourceCompatibility = 1.8
-    targetCompatibility = 1.8
-}
-
-task buildVoidstarBridge(type: Exec) {
-    workingDir projectDir
-
-    commandLine 'make', '-C', 'swig', 'build'
-}
-compileJava.dependsOn buildVoidstarBridge
-
-task cleanVoidstarBridge(type: Exec) {
-    workingDir projectDir
-
-    commandLine 'make', '-C', 'swig', 'clean'
-}
-clean.dependsOn cleanVoidstarBridge
-
-jar {
-
-    archiveClassifier = ''
-
-    manifest {
-        attributes 'Implementation-Title': 'Antithesis SDK for Java',
-                'Implementation-Version': "${project.version}",
-                'Created-By': "Gradle ${gradle.gradleVersion}",
-                'Build-Jdk': "${System.properties['java.version']} (${System.properties['java.vendor']} ${System.properties['java.vm.version']})",
-                'Build-OS': "${System.properties['os.name']} ${System.properties['os.arch']} ${System.properties['os.version']}"
+allprojects {
+    repositories {
+        mavenCentral()
     }
 }
 
-task copyDependencies(type: Copy) {
-    doLast {}
-    from configurations.runtimeClasspath
-    into 'build/dependencies'
-}
-build.dependsOn copyDependencies
+subprojects {
+    apply plugin: 'java'
 
-task generateJavadoc(type: Javadoc) {
-    source = sourceSets.main.allJava
-    exclude 'com/antithesis/sdk/internal/**'
+    archivesBaseName = "antithesis-${it.name}"
 
-    // Hack to enable Javadoc to compile while exclude internal functions
-    var sourceSetDirectories = sourceSets.main.java.srcDirs.join(":")
-    options.addStringOption("sourcepath", sourceSetDirectories)
-
-    classpath = sourceSets.main.compileClasspath
-    destinationDir = file("${buildDir}/docs/javadoc")
-}
-build.dependsOn generateJavadoc
-
-test {
-    systemProperty 'java.library.path', "${projectDir}/swig"
-    testLogging {
-        exceptionFormat = 'full'
-        showStandardStreams = true
+    compileJava {
+        sourceCompatibility = 1.8
+        targetCompatibility = 1.8
     }
 }
 
-tasks.named('test') {
-    useJUnitPlatform()
-}

@@ -1,0 +1,34 @@
+plugins {
+    id 'java-library'
+}
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+  // none
+}
+
+compileJava {
+    sourceCompatibility = 1.8
+    targetCompatibility = 1.8
+    options.compilerArgs += ["-Xlint:-options"]
+}
+
+task buildFfiBridge(type: Exec) {
+    workingDir projectDir
+    commandLine 'sh', '-c', './ffi_build.sh'
+}
+compileJava.dependsOn buildFfiBridge
+
+jar {
+    archiveClassifier = ''
+    manifest {
+        attributes 'Implementation-Title': 'Antithesis FFI for Java',
+                'Implementation-Version': "${project.version}",
+                'Created-By': "Gradle ${gradle.gradleVersion}",
+                'Build-Jdk': "${System.properties['java.version']} (${System.properties['java.vendor']} ${System.properties['java.vm.version']})",
+                'Build-OS': "${System.properties['os.name']} ${System.properties['os.arch']} ${System.properties['os.version']}"
+    }
+}
