@@ -1,19 +1,20 @@
-package com.antithesis.sdk.lifecycle;
+package com.antithesis.sdk;
 
 import com.antithesis.sdk.internal.Internal;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
 /**
- * Lifecycle contains static methods for 
- * setupComplete and sendEvent
+ * The lifecycle class contains methods which inform the Antithesis
+ * environment that particular test phases or milestones have been reached.
  */
 final public class Lifecycle {
 
     /**
      * Default constructor
      */
-    public Lifecycle(){}
+    public Lifecycle() {
+    }
 
     /**
      * Indicates to Antithesis that setup has completed. Call this function when

@@ -1,37 +1,28 @@
-package com.antithesis.sdk.assertions;
+package com.antithesis.sdk;
 
 import com.antithesis.sdk.internal.Assertion;
 import com.antithesis.sdk.internal.LocationInfo;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
 /**
- * Assertions contains static methods for 
- * always, sometimes, alwaysOrUnrechable, reachable and unreachable
+ * The assertions class enables defining <a href="https://antithesis.com/docs/using_antithesis/properties.html" target="_blank">test properties</a>
+ * about your program or <a href="https://antithesis.com/docs/getting_started/workload.html" target="_blank">workload</a>.
+ * <p>
+ * Each static method in this class takes a parameter called <code>message</code>, which is
+ * a string literal identifier used to aggregate assertions.
+ * Antithesis generates one test property per unique <code>message</code> This test property will be named <code>message</code> in the <a href="https://antithesis.com/docs/reports/triage.html" target="_blank">triage report</a>.
+ * <p>
+ * Each static method also takes a parameter called <code>details</code>, which is an <code>ObjectNode</code> reference of optional additional information provided by the user to add context for assertion failures.
+ * The information that is logged will appear in the <code>logs</code> section of a <a href="https://antithesis.com/docs/reports/triage.html" target="_blank">triage report</a>.
+ * Normally the values in <code>details</code> are evaluated at runtime.
  */
 final public class Assertions {
 
     /**
-     * Types of assertions available
-     */
-    public enum AssertType {
-        /**
-         * Condition must always be true
-         */
-        Always,
-        /**
-         * Condition must be true at least once
-         */
-        Sometimes,
-        /**
-         * Indicates if an assertion should be encountered
-         */
-        Reachability
-    }
-
-    /**
      * Default constructor
      */
-    public Assertions(){}
+    public Assertions() {
+    }
 
     /**
      * Assert that <code>condition</code> is true every time this function is called, <i>and</i> that it is
@@ -155,7 +146,7 @@ final public class Assertions {
 
     /**
      * This is a low-level method designed to be used by third-party frameworks.
-     * Regular users of the assertions package should not call it.
+     * Regular users of the assertions class should not call it.
      * <p>
      * This is primarily intended for use by adapters from other
      * diagnostic tools that intend to output Antithesis-style
@@ -219,5 +210,23 @@ final public class Assertions {
                 .mustHit(mustHit)
                 .build()
                 .trackEntry();
+    }
+
+    /**
+     * Types of assertions available
+     */
+    public enum AssertType {
+        /**
+         * Condition must always be true
+         */
+        Always,
+        /**
+         * Condition must be true at least once
+         */
+        Sometimes,
+        /**
+         * Indicates if an assertion should be encountered
+         */
+        Reachability
     }
 }

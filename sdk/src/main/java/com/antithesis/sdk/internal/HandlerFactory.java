@@ -1,20 +1,19 @@
 package com.antithesis.sdk.internal;
 
+import com.antithesis.ffi.internal.FfiHandler;
+import com.antithesis.ffi.internal.OutputHandler;
+
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.util.Optional;
 import java.util.Random;
 
-import com.antithesis.ffi.internal.OutputHandler;
-import com.antithesis.ffi.internal.FfiHandler;
-
 public class HandlerFactory {
 
+    private final static boolean CATALOG_SENT = didLoadCatalog();
     // Will be initialized through the static 'HandlerFactory.get()' function
     private static OutputHandler HANDLER_INSTANCE = null;
-
-    private final static boolean CATALOG_SENT = didLoadCatalog();
 
     private static boolean didLoadCatalog() {
         String className = "com.antithesis.sdk.generated.AssertionCatalog";
@@ -26,7 +25,8 @@ public class HandlerFactory {
         boolean shouldInitialize = true;
         try {
             theClass = Class.forName(className, shouldInitialize, classLoader);
-        } catch (Throwable ignored) {}
+        } catch (Throwable ignored) {
+        }
         return theClass != null;
     }
 
@@ -69,7 +69,6 @@ public class HandlerFactory {
 
         @Override
         public void notifyModuleEdge(long edgePlusModule) {
-            return;
         }
     }
 
@@ -119,7 +118,6 @@ public class HandlerFactory {
 
         @Override
         public void notifyModuleEdge(long edgePlusModule) {
-            return;
         }
     }
 
