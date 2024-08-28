@@ -5,32 +5,36 @@ import com.antithesis.sdk.internal.LocationInfo;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
 /**
- * The assertions class enables defining <a href="https://antithesis.com/docs/using_antithesis/properties.html" target="_blank">test properties</a>
+ * The Assert class enables defining <a href="https://antithesis.com/docs/using_antithesis/properties.html" target="_blank">test properties</a>
  * about your program or <a href="https://antithesis.com/docs/getting_started/workload.html" target="_blank">workload</a>.
  * <p>
  * Each static method in this class takes a parameter called <code>message</code>, which is
  * a string literal identifier used to aggregate assertions.
- * Antithesis generates one test property per unique <code>message</code> This test property will be named <code>message</code> in the <a href="https://antithesis.com/docs/reports/triage.html" target="_blank">triage report</a>.
+ * Antithesis generates one test property per unique <code>message</code>.  This test property will be named <code>message</code> in the <a href="https://antithesis.com/docs/reports/triage.html" target="_blank">triage report</a>.
  * <p>
  * Each static method also takes a parameter called <code>details</code>, which is an <code>ObjectNode</code> reference of optional additional information provided by the user to add context for assertion failures.
  * The information that is logged will appear in the <code>logs</code> section of a <a href="https://antithesis.com/docs/reports/triage.html" target="_blank">triage report</a>.
  * Normally the values in <code>details</code> are evaluated at runtime.
  */
-final public class Assertions {
+final public class Assert {
 
     /**
      * Default constructor
      */
-    public Assertions() {
+    public Assert() {
     }
 
     /**
      * Assert that <code>condition</code> is true every time this function is called, <i>and</i> that it is
      * called at least once. The corresponding test property will be viewable in the <code>Antithesis SDK: Always</code> group of your triage report.
      *
-     * @param condition the result of evaluating the assertion at runtime
-     * @param message   the unique text associated with the assertion
-     * @param details   additional values describing the program state when the assertion was evaluated at runtime
+     * @param condition the condition being asserted.  Evaluated at runtime.
+     * @param message   a unique string identifier of the assertion. 
+     *                  Provides context for assertion success/failure 
+     *                  and is intended to be human-readable.  Must be 
+     *                  provided as a string literal.
+     * @param details   additional details that provide greater context 
+     *                  for assertion success/failure.  Evaluated at runtime.
      */
     public static void always(final boolean condition, final String message, final ObjectNode details) {
         Assertion.builder()
@@ -53,9 +57,13 @@ final public class Assertions {
      * <p>
      * The corresponding test property will be viewable in the <code>Antithesis SDK: Always</code> group of your triage report.
      *
-     * @param condition the result of evaluating the assertion at runtime
-     * @param message   the unique text associated with the assertion
-     * @param details   additional values describing the program state when the assertion was evaluated at runtime
+     * @param condition the condition being asserted.  Evaluated at runtime.
+     * @param message   a unique string identifier of the assertion. 
+     *                  Provides context for assertion success/failure 
+     *                  and is intended to be human-readable.  Must be 
+     *                  provided as a string literal.
+     * @param details   additional details that provide greater context 
+     *                  for assertion success/failure.  Evaluated at runtime.
      */
     public static void alwaysOrUnreachable(final boolean condition, final String message, final ObjectNode details) {
         Assertion.builder()
@@ -77,9 +85,13 @@ final public class Assertions {
      * (If the assertion is never encountered, the test property will therefore fail.)
      * This test property will be viewable in the <code>Antithesis SDK: Sometimes</code> group.
      *
-     * @param condition the result of evaluating the assertion at runtime
-     * @param message   the unique text associated with the assertion
-     * @param details   additional values describing the program state when the assertion was evaluated at runtime
+     * @param condition the condition being asserted.  Evaluated at runtime.
+     * @param message   a unique string identifier of the assertion. 
+     *                  Provides context for assertion success/failure 
+     *                  and is intended to be human-readable.  Must be 
+     *                  provided as a string literal.
+     * @param details   additional details that provide greater context 
+     *                  for assertion success/failure.  Evaluated at runtime.
      */
     public static void sometimes(final boolean condition, final String message, final ObjectNode details) {
         Assertion.builder()
@@ -102,8 +114,12 @@ final public class Assertions {
      * (If it is never called the test property will therefore pass.)
      * This test property will be viewable in the <code>Antithesis SDK: Reachability assertions</code> group.
      *
-     * @param message the unique text associated with the assertion
-     * @param details additional values describing the program state when the assertion was evaluated at runtime
+     * @param message   a unique string identifier of the assertion. 
+     *                  Provides context for assertion success/failure 
+     *                  and is intended to be human-readable.  Must be 
+     *                  provided as a string literal.
+     * @param details   additional details that provide greater context 
+     *                  for assertion success/failure.  Evaluated at runtime.
      */
     public static void unreachable(final String message, final ObjectNode details) {
         Assertion.builder()
@@ -126,8 +142,12 @@ final public class Assertions {
      * (If it is never called the test property will therefore fail.)
      * This test property will be viewable in the <code>Antithesis SDK: Reachability assertions</code> group.
      *
-     * @param message the unique text associated with the assertion
-     * @param details additional values describing the program state when the assertion was evaluated at runtime
+     * @param message   a unique string identifier of the assertion. 
+     *                  Provides context for assertion success/failure 
+     *                  and is intended to be human-readable.  Must be 
+     *                  provided as a string literal.
+     * @param details   additional details that provide greater context 
+     *                  for assertion success/failure.  Evaluated at runtime.
      */
     public static void reachable(final String message, final ObjectNode details) {
         Assertion.builder()
@@ -153,8 +173,8 @@ final public class Assertions {
      * assertions.
      * <p>
      * Be certain to provide an assertion catalog entry
-     * for each assertion issued with <code>assert_raw()</code>.  Assertion catalog
-     * entries are also created using <code>assert_raw()</code>, by setting the value
+     * for each assertion issued with <code>rawAssert()</code>.  Assertion catalog
+     * entries are also created using <code>rawAssert()</code>, by setting the value
      * of the <code>hit</code> parameter to false.
      * <p>
      * Please refer to the general Antithesis documentation regarding the
@@ -169,9 +189,12 @@ final public class Assertions {
      * @param beginLine    the source line number where the assertion is located
      * @param beginColumn  the source column number where the assertion is located
      * @param id           the unique text associated with the assertion
-     * @param condition    the result of evaluating the assertion at runtime
-     * @param message      the unique text associated with the assertion
-     * @param details      additional values describing the program state when the assertion was evaluated at runtime
+     * @param condition    the condition being asserted.  Evaluated at runtime.
+     * @param message   a unique string identifier of the assertion. 
+     *                  Provides context for assertion success/failure 
+     *                  and is intended to be human-readable.
+     * @param details   additional details that provide greater context 
+     *                  for assertion success/failure.  Evaluated at runtime.
      * @param hit          true if the assertion has been evaluated, false if the assertion is being added to the assertion catalog
      * @param mustHit      true if the assertion is expected to be evaluated at least once, otherwise false
      */

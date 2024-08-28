@@ -5,7 +5,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
 /**
- * The lifecycle class contains methods which inform the Antithesis
+ * The Lifecycle class contains methods which inform the Antithesis
  * environment that particular test phases or milestones have been reached.
  */
 final public class Lifecycle {
@@ -26,8 +26,8 @@ final public class Lifecycle {
      * Antithesis will treat the first time any process called this function as
      * the moment that the setup was completed.
      *
-     * @param details additional values describing the program state
-     *                when the setupComplete was evaluated
+     * @param details   additional details that provide greater context 
+     *                  for system setup.  Evaluated at runtime.
      */
     public static void setupComplete(final ObjectNode details) {
         ObjectMapper mapper = new ObjectMapper();
@@ -49,18 +49,19 @@ final public class Lifecycle {
      * In addition to <code>details</code>, you also provide <code>rawName</code>,
      * which is the name of the event that you are logging.
      *
-     * @param rawName the name of the event that is being logged
-     * @param details event values
+     * @param name the name of the event that is being logged
+     * @param details   additional details that provide greater context 
+     *                  for the lifecycle event.  Evaluated at runtime.
      */
-    public static void sendEvent(final String rawName, final ObjectNode details) {
-        String name = rawName.trim();
-        if (name.isEmpty()) {
-            name = "anonymous";
+    public static void sendEvent(final String name, final ObjectNode details) {
+        String thisName = name.trim();
+        if (thisName.isEmpty()) {
+            thisName = "anonymous";
         }
 
         ObjectMapper mapper = new ObjectMapper();
         ObjectNode eventJson = mapper.createObjectNode();
-        eventJson.put(name, details);
+        eventJson.put(thisName, details);
 
         Internal.dispatchOutput(eventJson);
     }
