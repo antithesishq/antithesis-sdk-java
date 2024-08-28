@@ -66,6 +66,7 @@ let
         runHook preInstall
         mkdir -p $out/lib
         cp --verbose build/{libs,dependencies}/*.jar $out/lib
+        cp -r build/docs $out/docs
         runHook postInstall
       '';
   });
@@ -73,6 +74,7 @@ let
 in {
   inherit sdk;
   java_sdk = "${sdk}/lib";
+  docs = "${sdk}/docs";
 
   gradleUpdateScript = pkgs.writeShellScript "generate_gradle_lock_file" ''
     export JAVA_HOME=${pkgs.jdk21}
