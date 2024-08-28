@@ -1,6 +1,6 @@
 package com.antithesis.sdk.internal;
 
-import com.antithesis.sdk.assertions.Assertions;
+import com.antithesis.sdk.Assertions;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.core.JsonGenerator;
 import com.fasterxml.jackson.databind.JsonSerializer;
@@ -19,33 +19,6 @@ public final class Assertion {
 
     private static final LocationInfo NoInfo = new LocationInfo(
             "class", "function", "file", 0, 0);
-
-    private static class TrackingInfo {
-        int passCount = 0;
-        int failCount = 0;
-        LocationInfo locInfo;
-
-        public TrackingInfo(final LocationInfo locInfo) {
-            this.locInfo = locInfo;
-        }
-
-        protected void trackPass() {
-            this.passCount++;
-        }
-
-        protected void trackFail() {
-            this.failCount++;
-        }
-
-        protected void setLocationInfo(final LocationInfo locInfo) {
-            this.locInfo = locInfo;
-        }
-
-        protected LocationInfo getLocationInfo() {
-            return this.locInfo;
-        }
-    }
-
     private static final Map<String, TrackingInfo> TRACKER = new ConcurrentHashMap<>();
     private static final ObjectMapper MAPPER;
 
@@ -68,28 +41,20 @@ public final class Assertion {
 
     @JsonProperty("assert_type")
     final private Assertions.AssertType assertType;
-
     @JsonProperty("display_type")
     final private String displayType;
-
     @JsonProperty("condition")
     final private boolean condition;
-
     @JsonProperty("message")
     final private String message;
-
     @JsonProperty("location")
     final private LocationInfo location;
-
     @JsonProperty("hit")
     final private boolean hit;
-
     @JsonProperty("must_hit")
     final private boolean mustHit;
-
     @JsonProperty("id")
     final private String id;
-
     @JsonProperty("details")
     final private ObjectNode details;
 
@@ -135,6 +100,32 @@ public final class Assertion {
 
     private void emit() {
         Internal.dispatchOutput(MAPPER.valueToTree(this));
+    }
+
+    private static class TrackingInfo {
+        int passCount = 0;
+        int failCount = 0;
+        LocationInfo locInfo;
+
+        public TrackingInfo(final LocationInfo locInfo) {
+            this.locInfo = locInfo;
+        }
+
+        protected void trackPass() {
+            this.passCount++;
+        }
+
+        protected void trackFail() {
+            this.failCount++;
+        }
+
+        protected LocationInfo getLocationInfo() {
+            return this.locInfo;
+        }
+
+        protected void setLocationInfo(final LocationInfo locInfo) {
+            this.locInfo = locInfo;
+        }
     }
 
 }

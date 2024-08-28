@@ -1,4 +1,4 @@
-package com.antithesis.sdk.lifecycle;
+package com.antithesis.sdk;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;

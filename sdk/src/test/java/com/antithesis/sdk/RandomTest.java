@@ -1,4 +1,4 @@
-package com.antithesis.sdk.random;
+package com.antithesis.sdk;
 
 import org.junit.jupiter.api.Test;
 
@@ -46,7 +46,7 @@ public class RandomTest {
     @Test
     void getRandom10k() {
         HashSet<Long> random_numbers = new HashSet<Long>();
-        for(int i = 0; i < 10_000; i++) {
+        for (int i = 0; i < 10_000; i++) {
             long rn = Random.getRandom();
             assertFalse(random_numbers.contains(rn));
             random_numbers.add(rn);

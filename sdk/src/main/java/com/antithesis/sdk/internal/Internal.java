@@ -17,7 +17,8 @@ final public class Internal {
         try {
             String jsonStr = MAPPER.writeValueAsString(s);
             HandlerFactory.get().output(jsonStr);
-        } catch (IOException ignored) {}
+        } catch (IOException ignored) {
+        }
     }
 
     public static long dispatchInitializeModuleCoverage(long edgeCount, String symbolFilePath) {
