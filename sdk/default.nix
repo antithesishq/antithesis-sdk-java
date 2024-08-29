@@ -33,11 +33,11 @@ let
       gradleBuildFlags = [ "--quiet" "build" ];
       buildJdkVersion = pkgs.jdk21;
     }).overrideAttrs(_: prev: {
-      src = [ 
-        ./build.gradle 
-        ./settings.gradle 
-        ../gradle.properties 
-        ./src 
+      src = [
+        ./build.gradle
+        ./settings.gradle
+        ../gradle.properties
+        ./src
       ];
 
       # A custom "unpack" is needed to provide a straightforward 

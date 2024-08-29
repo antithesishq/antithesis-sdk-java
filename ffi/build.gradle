@@ -10,6 +10,7 @@ dependencies {
   // none
 }
 
+
 compileJava {
     sourceCompatibility = 1.8
     targetCompatibility = 1.8
@@ -18,12 +19,19 @@ compileJava {
 
 task buildFfiBridge(type: Exec) {
     workingDir projectDir
-    commandLine 'sh', '-c', './ffi_build.sh'
+    if (file("./ffi_build.sh").isFile()) { 
+      commandLine 'sh', '-c', './ffi_build.sh'
+    }
+    else {
+        commandLine 'make', '-C', 'swig', 'build'
+    }
 }
 compileJava.dependsOn buildFfiBridge
 
 jar {
     archiveClassifier = ''
+    archiveAppendix = 'ffi'
+    archiveBaseName = 'antithesis'
     manifest {
         attributes 'Implementation-Title': 'Antithesis FFI for Java',
                 'Implementation-Version': "${project.version}",
