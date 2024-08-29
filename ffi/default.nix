@@ -58,9 +58,6 @@ let
         # make sure we can copy files into this directory (and below)
         chmod -R 777 .
 
-        # push in a custom settings.gradle
-        # echo "rootProject.name = 'antithesis'" > settings.gradle
-
         # Establish ffi_build.sh for later use by gradle
         # the 'buildFfiBridge' task invokes ffi_build.sh via commandLine'
         ln -s ${ffibuild}  ./ffi_build.sh
