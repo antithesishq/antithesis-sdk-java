@@ -19,14 +19,24 @@ compileJava {
 
 task buildFfiBridge(type: Exec) {
     workingDir projectDir
-    if (file("./ffi_build.sh").isFile()) { 
-      commandLine 'sh', '-c', './ffi_build.sh'
+    if (file("./ffi_build.sh").isFile()) {
+        commandLine 'sh', '-c', './ffi_build.sh'
     }
     else {
+        // Enter the swig directory and make the 'build' target
         commandLine 'make', '-C', 'swig', 'build'
     }
 }
 compileJava.dependsOn buildFfiBridge
+
+task cleanFfiBridge(type: Exec) {
+    workingDir projectDir
+    if (!file("./ffi_build.sh").isFile()) {
+        // Enter the swig directory and make the 'clean' target
+        commandLine 'make', '-C', 'swig', 'clean'
+    }
+}
+clean.dependsOn cleanFfiBridge
 
 jar {
     archiveClassifier = ''
