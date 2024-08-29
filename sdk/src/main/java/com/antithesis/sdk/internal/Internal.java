@@ -21,11 +21,4 @@ final public class Internal {
         }
     }
 
-    public static long dispatchInitializeModuleCoverage(long edgeCount, String symbolFilePath) {
-        return HandlerFactory.get().initializeModuleCoverage(edgeCount, symbolFilePath);
-    }
-
-    public static void dispatchNotifyModuleEdge(long edgePlusModule) {
-        HandlerFactory.get().notifyModuleEdge(edgePlusModule);
-    }
 }
