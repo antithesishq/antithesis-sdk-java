@@ -62,14 +62,6 @@ public class HandlerFactory {
             return new Random().nextLong();
         }
 
-        @Override
-        public long initializeModuleCoverage(long edgeCount, String symbolFilePath) {
-            return edgeCount;
-        }
-
-        @Override
-        public void notifyModuleEdge(long edgePlusModule) {
-        }
     }
 
     private static class LocalHandler implements OutputHandler {
@@ -102,7 +94,6 @@ public class HandlerFactory {
                 writer.write("\n");
                 writer.flush();
             } catch (IOException ignored) {
-                // TODO (@shomik) logging
             }
         }
 
@@ -111,14 +102,6 @@ public class HandlerFactory {
             return new Random().nextLong();
         }
 
-        @Override
-        public long initializeModuleCoverage(long edgeCount, String symbolFilePath) {
-            return 0;
-        }
-
-        @Override
-        public void notifyModuleEdge(long edgePlusModule) {
-        }
     }
 
 }
