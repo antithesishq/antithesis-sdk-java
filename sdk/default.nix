@@ -1,4 +1,4 @@
-{ ffiPath ? (import ./../ffi/default.nix {}).java_ffi
+{ ffi ? (import ./../ffi/default.nix {}).ffi
 }:
 let
   pkgs = import (builtins.fetchTarball {
@@ -57,7 +57,7 @@ let
 
         # copy the ffi jar into src/libs/antithesis-ffi-1.3.0.jar
         mkdir -p libs
-        cp -R ${ffiPath}/*.jar libs
+        cp -R ${ffi}/lib/*.jar libs
 
         runHook postUnpack
       '';
@@ -73,7 +73,6 @@ let
 
 in {
   inherit sdk;
-  java_sdk = "${sdk}/lib";
   docs = "${sdk}/docs";
 
   gradleUpdateScript = pkgs.writeShellScript "generate_gradle_lock_file" ''
