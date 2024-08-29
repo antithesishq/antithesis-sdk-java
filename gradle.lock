@@ -41,36 +41,6 @@
       "hash": "sha256-rg9fotav2gz7v8YSiu/bL1OteDW9XEMaR6mad2NETok="
     }
   },
-  "com.googlecode.json-simple:json-simple:1.1.1": {
-    "json-simple-1.1.1.jar": {
-      "url": "https://repo.maven.apache.org/maven2/com/googlecode/json-simple/json-simple/1.1.1/json-simple-1.1.1.jar",
-      "hash": "sha256-TmlpaJK4i0HFXUmrL9zCHurZK/VKzFiMAFBZbDt1GZw="
-    },
-    "json-simple-1.1.1.pom": {
-      "url": "https://repo.maven.apache.org/maven2/com/googlecode/json-simple/json-simple/1.1.1/json-simple-1.1.1.pom",
-      "hash": "sha256-Zl9jWQ3vtj1irdIdNSU2LPk3z2ocBeSwFFuujailf4M="
-    }
-  },
-  "junit:junit:4.10": {
-    "junit-4.10.jar": {
-      "url": "https://repo.maven.apache.org/maven2/junit/junit/4.10/junit-4.10.jar",
-      "hash": "sha256-NqdHyh4LhvbqiAVbhyO7hwMNYndm2mKIvwd6/e6w91o="
-    },
-    "junit-4.10.pom": {
-      "url": "https://repo.maven.apache.org/maven2/junit/junit/4.10/junit-4.10.pom",
-      "hash": "sha256-IqG/C6rothBretgCbs8nxZ5+R920nWKXUDa+rbLGLrU="
-    }
-  },
-  "net.java.dev.jna:jna:5.13.0": {
-    "jna-5.13.0.jar": {
-      "url": "https://repo.maven.apache.org/maven2/net/java/dev/jna/jna/5.13.0/jna-5.13.0.jar",
-      "hash": "sha256-ZtT4GaBipRodVie//CP6xV0Wd/Dgof66FEqr3WcKZLs="
-    },
-    "jna-5.13.0.pom": {
-      "url": "https://repo.maven.apache.org/maven2/net/java/dev/jna/jna/5.13.0/jna-5.13.0.pom",
-      "hash": "sha256-9RXCV4F49FJH7Mp6nh2xCVMbHELyQk4lPO6w9rjUI3Q="
-    }
-  },
   "org.apiguardian:apiguardian-api:1.1.2": {
     "apiguardian-api-1.1.2.jar": {
       "url": "https://repo.maven.apache.org/maven2/org/apiguardian/apiguardian-api/1.1.2/apiguardian-api-1.1.2.jar",
@@ -83,22 +53,6 @@
     "apiguardian-api-1.1.2.pom": {
       "url": "https://repo.maven.apache.org/maven2/org/apiguardian/apiguardian-api/1.1.2/apiguardian-api-1.1.2.pom",
       "hash": "sha256-MjVQgdEJCVw9XTdNWkO09MG3XVSemD71ByPidy5TAqA="
-    }
-  },
-  "org.hamcrest:hamcrest-core:1.1": {
-    "hamcrest-core-1.1.jar": {
-      "url": "https://repo.maven.apache.org/maven2/org/hamcrest/hamcrest-core/1.1/hamcrest-core-1.1.jar",
-      "hash": "sha256-A2HRST/w2U+GE1nv6pEgByBjUHITR5LvtyF/bgnVz/s="
-    },
-    "hamcrest-core-1.1.pom": {
-      "url": "https://repo.maven.apache.org/maven2/org/hamcrest/hamcrest-core/1.1/hamcrest-core-1.1.pom",
-      "hash": "sha256-OXOH9AbGjMtAP0d8y+wcgYz8a4/0+tpaM+Jhg6hBfIM="
-    }
-  },
-  "org.hamcrest:hamcrest-parent:1.1": {
-    "hamcrest-parent-1.1.pom": {
-      "url": "https://repo.maven.apache.org/maven2/org/hamcrest/hamcrest-parent/1.1/hamcrest-parent-1.1.pom",
-      "hash": "sha256-FOaVChpimMvLg8+UKcrEFf8nMWf28Vh2hZQTsNbAfjo="
     }
   },
   "org.junit:junit-bom:5.9.3": {
@@ -217,6 +171,16 @@
     "opentest4j-1.2.0.pom": {
       "url": "https://repo.maven.apache.org/maven2/org/opentest4j/opentest4j/1.2.0/opentest4j-1.2.0.pom",
       "hash": "sha256-qW5nGBbB/4gDvex0ySQfAlvfsnfaXStO4CJmQFk2+ZQ="
+    }
+  },
+  "org.projectlombok:lombok:1.18.34": {
+    "lombok-1.18.34.jar": {
+      "url": "https://repo.maven.apache.org/maven2/org/projectlombok/lombok/1.18.34/lombok-1.18.34.jar",
+      "hash": "sha256-wn1rKv9WJB0bB/y8xrGDcJ5rQyyA9zdO6x2CPobUuBo="
+    },
+    "lombok-1.18.34.pom": {
+      "url": "https://repo.maven.apache.org/maven2/org/projectlombok/lombok/1.18.34/lombok-1.18.34.pom",
+      "hash": "sha256-4ZCf4nLP/In/KJsTIeibZB/vc5ghZhu2k6b5ZqF+2eU="
     }
   }
 }

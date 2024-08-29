@@ -1,1 +1,3 @@
-rootProject.name = 'antithesis-sdk'
+rootProject.name = 'antithesis'
+include('ffi')
+project(':ffi').projectDir = new File('../ffi')

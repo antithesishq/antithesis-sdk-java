@@ -33,11 +33,11 @@ let
       gradleBuildFlags = [ "--quiet" "build" ];
       buildJdkVersion = pkgs.jdk21;
     }).overrideAttrs(_: prev: {
-      src = [ 
-        ./build.gradle 
-        ./settings.gradle 
-        ../gradle.properties 
-        ./src 
+      src = [
+        ./build.gradle
+        ./settings.gradle
+        ../gradle.properties
+        ./src
       ];
 
       # A custom "unpack" is needed to provide a straightforward 
@@ -54,6 +54,9 @@ let
         done
         # make sure we can copy files into this directory (and below)
         chmod -R 777 .
+
+        # push in a custom settings.gradle
+        # echo "rootProject.name = 'antithesis'" > settings.gradle
 
         # copy the ffi jar into src/libs/antithesis-ffi-1.3.0.jar
         mkdir -p libs

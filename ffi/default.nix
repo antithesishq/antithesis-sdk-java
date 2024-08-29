@@ -27,23 +27,23 @@ let
   in (gradle2nix.buildGradlePackage {
       pname = "Antithesis Java FFI";
       version = ffi_version;
-      lockFile = "${../gradle.lock}";
+      lockFile = "${./gradle.lock}";
       gradleBuildFlags = [ "--quiet" "build" ];
       buildJdkVersion = pkgs.jdk21;
     }).overrideAttrs(_: prev: {
-      src = [ 
-        ./build.gradle 
-        ./settings.gradle 
-        ../gradle.properties 
-        ./src 
-        ./swig  
+      src = [
+        ./build.gradle
+        ./settings.gradle
+        ../gradle.properties
+        ./src
+        ./swig
       ];
 
       # A custom "unpack" is needed to provide a straightforward 
       # src directory with mixed files and subdirectories
       unpackPhase = let 
         ffinix = (import ./ffi.nix {inherit pkgs;});
-        ffibuild = ffinix.build_script; 
+        ffibuild = ffinix.build_script;
       in ''
         runHook preUnpack
         for srcFile in $src; do
@@ -58,10 +58,13 @@ let
         # make sure we can copy files into this directory (and below)
         chmod -R 777 .
 
-        # Establish ffi_build.sh for later use by gradle 
-        # the 'buildFfiBridge' task invokes ffi_build.sh via commandLine'
-        ln -s ${ffibuild} ./ffi_build.sh
+        # push in a custom settings.gradle
+        # echo "rootProject.name = 'antithesis'" > settings.gradle
 
+        # Establish ffi_build.sh for later use by gradle
+        # the 'buildFfiBridge' task invokes ffi_build.sh via commandLine'
+        ln -s ${ffibuild}  ./ffi_build.sh
+ 
         runHook postUnpack
       '';
 
