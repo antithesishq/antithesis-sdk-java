@@ -1,6 +1,7 @@
 { }:
 let
-  ffiPath = (import ./ffi/default.nix {}).java_ffi;
+  ffi = (import ./ffi/default.nix {}).ffi;  
 in {
-  inherit (import ./sdk/default.nix { inherit ffiPath; }) sdk java_sdk docs;
+  inherit ffi;
+  inherit (import ./sdk/default.nix { inherit ffi; }) sdk docs;
 }

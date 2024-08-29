@@ -75,7 +75,6 @@ let
 
 in {
   inherit ffi;
-  java_ffi = "${ffi}/lib";
 
   gradleUpdateScript = pkgs.writeShellScript "generate_gradle_lock_file" ''
     export JAVA_HOME=${pkgs.jdk21}
