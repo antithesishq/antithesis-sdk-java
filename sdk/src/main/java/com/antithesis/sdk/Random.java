@@ -5,7 +5,7 @@ import com.antithesis.sdk.internal.Internal;
 import java.util.Optional;
 
 /**
- * The random class provides methods that request both structured and unstructured randomness from the Antithesis environment.
+ * The Random class provides methods that request both structured and unstructured randomness from the Antithesis environment.
  * <p>
  * These methods should not be used to seed a conventional PRNG, and should not have their return values stored and used to make a decision at a later time.
  * Doing either of these things makes it much harder for the Antithesis platform to control the history of your program's execution, and also makes it harder for Antithesis to learn which inputs provided at which times are most fruitful.
@@ -23,11 +23,11 @@ final public class Random {
     }
 
     /**
-     * Returns a long value chosen by Antithesis. You should not
+     * Returns a value chosen by Antithesis. You should not
      * store this value or use it to seed a PRNG, but should use it
      * immediately.
      *
-     * @return Random value
+     * @return Random long integer
      */
     public static long getRandom() {
         return Internal.dispatchRandom();
@@ -44,7 +44,7 @@ final public class Random {
      *
      * @param array An array of items to select from
      * @param <T>   Type of the array member items
-     * @return Selected item
+     * @return Randomly selected item from the provided array.
      */
     public static <T> Optional<T> randomChoice(T[] array) {
         if (array.length == 0) {

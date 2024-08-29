@@ -1,6 +1,6 @@
 package com.antithesis.sdk.internal;
 
-import com.antithesis.sdk.Assertions;
+import com.antithesis.sdk.Assert;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.core.JsonGenerator;
 import com.fasterxml.jackson.databind.JsonSerializer;
@@ -23,9 +23,9 @@ public final class Assertion {
     private static final ObjectMapper MAPPER;
 
     static {
-        class LowercaseEnumSerializer extends JsonSerializer<Assertions.AssertType> {
+        class LowercaseEnumSerializer extends JsonSerializer<Assert.AssertType> {
             @Override
-            public void serialize(Assertions.AssertType value, JsonGenerator jsonGen, SerializerProvider provider) throws IOException {
+            public void serialize(Assert.AssertType value, JsonGenerator jsonGen, SerializerProvider provider) throws IOException {
                 jsonGen.writeString(value.name().toLowerCase());
             }
         }
@@ -33,14 +33,14 @@ public final class Assertion {
         ObjectMapper mapper = new ObjectMapper();
 
         SimpleModule module = new SimpleModule();
-        module.addSerializer(Assertions.AssertType.class, new LowercaseEnumSerializer());
+        module.addSerializer(Assert.AssertType.class, new LowercaseEnumSerializer());
         mapper.registerModule(module);
 
         MAPPER = mapper;
     }
 
     @JsonProperty("assert_type")
-    final private Assertions.AssertType assertType;
+    final private Assert.AssertType assertType;
     @JsonProperty("display_type")
     final private String displayType;
     @JsonProperty("condition")

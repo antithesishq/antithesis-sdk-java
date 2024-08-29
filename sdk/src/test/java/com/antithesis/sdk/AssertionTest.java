@@ -13,7 +13,7 @@ public class AssertionTest {
         details.put("color", "always red");
         details.put("extent", 15);
 
-        Assertions.always(true, "Always message", details);
+        Assert.always(true, "Always message", details);
     }
 
     @Test
@@ -24,7 +24,7 @@ public class AssertionTest {
         details.put("color", "sometimes red");
         details.put("extent", 17);
 
-        Assertions.sometimes(true, "Sometimes message", details);
+        Assert.sometimes(true, "Sometimes message", details);
     }
 
     @Test
@@ -35,6 +35,6 @@ public class AssertionTest {
         details.put("color", "reachable red");
         details.put("extent", 19);
 
-        Assertions.reachable("Reachable message", details);
+        Assert.reachable("Reachable message", details);
     }
 }
