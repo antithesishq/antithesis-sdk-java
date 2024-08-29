@@ -30,17 +30,19 @@ import java.nio.file.StandardCopyOption;
 %}
 
 %pragma(java) jniclasscode=%{
-
-
     private static final String NATIVE_LIBRARY_PATH = "/usr/lib/libvoidstar.so";
 
     public static boolean hasNativeLibrary() {
        return Files.exists(Paths.get(NATIVE_LIBRARY_PATH));
     }
 
-    public static void loadLibrary() throws IOException {
-        try {
-            if (hasNativeLibrary()) {
+    // Static variables initialization is guaranteed to execute by the Java Language Spec
+    public static boolean LOAD_LIBRARY_MARKER = loadLibrary();
+
+    public static boolean loadLibrary() {
+        boolean nativeLibraryFound = hasNativeLibrary();
+        if (nativeLibraryFound) {
+            try {
                 System.load(NATIVE_LIBRARY_PATH);
                 File file = File.createTempFile("libFfiWrapper", ".so");
                 try (InputStream link = (Thread.currentThread().getContextClassLoader().getResourceAsStream("libFfiWrapper.so"))){
@@ -50,13 +52,13 @@ import java.nio.file.StandardCopyOption;
                         StandardCopyOption.REPLACE_EXISTING);
                     System.load(file.getAbsoluteFile().toString());
                 }
-            } else {
-                throw new RuntimeException("Failed to locate native code library");
+            } catch (UnsatisfiedLinkError e) {
+                return false;
+            } catch (IOException e) {
+                return false;
             }
-        } catch (UnsatisfiedLinkError e) {
-            System.err.println("Native code library failed to load. \n" + e);
-            throw e;
         }
+        return nativeLibraryFound;
     }
 %}
 

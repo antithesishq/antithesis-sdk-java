@@ -2,14 +2,16 @@ package com.antithesis.ffi.internal;
 
 import java.util.Optional;
 
-public class FfiHandler implements OutputHandler {
+public class FfiHandler implements OutputHandler, CoverageHandler {
 
     private static long offset = -1;
 
     public static Optional<OutputHandler> get() {
         try {
-            FfiWrapperJNI.loadLibrary();
-            return Optional.of(new FfiHandler());
+            if(FfiWrapperJNI.LOAD_LIBRARY_MARKER) {
+                return Optional.of(new FfiHandler());
+            }
+            return Optional.empty();
         } catch (Throwable e) {
             return Optional.empty();
         }
@@ -26,6 +28,7 @@ public class FfiHandler implements OutputHandler {
         return FfiWrapperJNI.fuzz_get_random();
     }
 
+    @Override
     public long initializeModuleCoverage(long edgeCount, String symbolFilePath) {
         if (offset != -1) {
             // A Java application may not contain multiple "modules" in Antithesis terms.
@@ -38,6 +41,7 @@ public class FfiHandler implements OutputHandler {
         return offset;
     }
 
+    @Override
     public void notifyModuleEdge(long edgePlusModule) {
         // Right now, the Java implementation defers completely to the native library.
         // See instrumentation.h to understand the logic here. The shim (i.e. StaticModule.java)

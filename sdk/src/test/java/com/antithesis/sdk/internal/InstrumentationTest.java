@@ -12,28 +12,18 @@ import static org.junit.jupiter.api.Assumptions.assumeTrue;
 public class InstrumentationTest {
     @Test
     void testRandom() {
-        assumeTrue(FfiWrapperJNI.hasNativeLibrary());
-        try {
-            FfiWrapperJNI.loadLibrary();
-        } catch (Throwable e) {
-            fail("Unable to load native library");
-        }
+        assumeTrue(FfiWrapperJNI.LOAD_LIBRARY_MARKER);
         FfiWrapperJNI.fuzz_get_random();
     }
 
     @Test
     void testJsonData() {
-        assumeTrue(FfiWrapperJNI.hasNativeLibrary());
+        assumeTrue(FfiWrapperJNI.LOAD_LIBRARY_MARKER);
 
         ObjectMapper mapper = new ObjectMapper();
         ObjectNode jsonNode = mapper.createObjectNode();
         jsonNode.put("hello", "world");
 
-        try {
-            FfiWrapperJNI.loadLibrary();
-        } catch (Throwable e) {
-            fail("Unable to load native library");
-        }
         String theString = "";
         try {
             theString = mapper.writeValueAsString(jsonNode);
@@ -45,12 +35,7 @@ public class InstrumentationTest {
 
     @Test
     void testFlush() {
-        assumeTrue(FfiWrapperJNI.hasNativeLibrary());
-        try {
-            FfiWrapperJNI.loadLibrary();
-        } catch (Throwable e) {
-            fail("Unable to load native library");
-        }
+        assumeTrue(FfiWrapperJNI.LOAD_LIBRARY_MARKER);
         FfiWrapperJNI.fuzz_flush();
     }
 }
