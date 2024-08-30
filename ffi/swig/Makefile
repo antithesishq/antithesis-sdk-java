@@ -1,4 +1,4 @@
-build: 
+build:
 	# Generate java and .c files needed for JNI
 	swig -java -package com.antithesis.ffi.internal FfiWrapper.i
 
@@ -12,7 +12,7 @@ build:
 	# ldd will fail to resolve this outside of the Antithesis runtime environment
 	# libFfiWrapper is only loaded if libvoidstar is successfully
 	# loaded first.
-	patchelf --add-needed libvoidstar.so ./libFfiWrapper.so
+	patchelf --add-needed /usr/lib/libvoidstar.so ./libFfiWrapper.so
 
 	# Move the wrapper into a folder so it can be added into the target jar
 	mkdir -p ../src/main/resources

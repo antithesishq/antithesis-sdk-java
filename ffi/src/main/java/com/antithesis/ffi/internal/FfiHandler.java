@@ -1,20 +1,16 @@
 package com.antithesis.ffi.internal;
 
-import java.nio.charset.StandardCharsets;
 import java.util.Optional;
-import java.util.logging.Logger;
 
-public class FfiHandler implements OutputHandler {
+public class FfiHandler implements OutputHandler, CoverageHandler {
 
     private static long offset = -1;
 
     public static Optional<OutputHandler> get() {
-        try {
-            FfiWrapperJNI.loadLibrary();
+        if(FfiWrapperJNI.LOAD_LIBRARY_MARKER) {
             return Optional.of(new FfiHandler());
-        } catch (Throwable e) {
-            return Optional.empty();
         }
+        return Optional.empty();
     }
 
     @Override
@@ -39,15 +35,12 @@ public class FfiHandler implements OutputHandler {
         }
         offset = FfiWrapperJNI.init_coverage_module(edgeCount, symbolFilePath);
         String msg = String.format("Initialized Java module at offset 0x%016x with %d edges; symbol file %s", offset, edgeCount, symbolFilePath);
-        // TODO: (@shomik) logger.info(msg); 
+        System.out.println(msg);
         return offset;
     }
 
     @Override
     public void notifyModuleEdge(long edgePlusModule) {
-        // Right now, the Java implementation defers completely to the native library. 
-        // See instrumentation.h to understand the logic here. The shim (i.e. StaticModule.java)
-        // is responsible for handling the return value.
         FfiWrapperJNI.notify_coverage(edgePlusModule);
     }
 
