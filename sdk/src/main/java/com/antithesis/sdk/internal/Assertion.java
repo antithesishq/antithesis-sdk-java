@@ -76,23 +76,20 @@ public final class Assertion {
             return;
         }
 
-        TRACKER.compute(this.id, (key, value) -> {
-            if (key != null && value != null) {
-                // Record the condition in the associated TrackingInfo entry,
-                if (this.condition) {
-                    value.trackPass();
-                } else {
-                    value.trackFail();
-                }
-                return value;
-            } else {
+        TrackingInfo trackingInfo = TRACKER.compute(this.id, (key, value) -> {
+            if (value == null) {
                 // Establish TrackingInfo for this trackingKey when needed
-                return new TrackingInfo(this.location);
+                value = new TrackingInfo(this.location);
             }
+            // Record the condition in the associated TrackingInfo entry,
+            if (this.condition) {
+                value.trackPass();
+            } else {
+                value.trackFail();
+            }
+            return value;
         });
 
-        // Emit the assertion when first seeing a condition
-        TrackingInfo trackingInfo = TRACKER.get(this.id);
         if (trackingInfo.failCount == 1 || trackingInfo.passCount == 1) {
             emit();
         }
