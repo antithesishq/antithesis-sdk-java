@@ -7,14 +7,10 @@ public class FfiHandler implements OutputHandler, CoverageHandler {
     private static long offset = -1;
 
     public static Optional<OutputHandler> get() {
-        try {
-            if(FfiWrapperJNI.LOAD_LIBRARY_MARKER) {
-                return Optional.of(new FfiHandler());
-            }
-            return Optional.empty();
-        } catch (Throwable e) {
-            return Optional.empty();
+        if(FfiWrapperJNI.LOAD_LIBRARY_MARKER) {
+            return Optional.of(new FfiHandler());
         }
+        return Optional.empty();
     }
 
     @Override

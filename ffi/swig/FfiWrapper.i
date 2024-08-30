@@ -39,7 +39,7 @@ import java.nio.file.StandardCopyOption;
     // Static variables initialization is guaranteed to execute by the Java Language Spec
     public static boolean LOAD_LIBRARY_MARKER = loadLibrary();
 
-    public static boolean loadLibrary() {
+    private static boolean loadLibrary() {
         boolean nativeLibraryFound = hasNativeLibrary();
         if (nativeLibraryFound) {
             try {
@@ -53,8 +53,13 @@ import java.nio.file.StandardCopyOption;
                     System.load(file.getAbsoluteFile().toString());
                 }
             } catch (UnsatisfiedLinkError e) {
+                System.err.println("Failed to load a native library:" + e);
                 return false;
             } catch (IOException e) {
+                System.err.println("Failed to load FFI wrapper from resources:" + e);
+                return false;
+            } catch (Exception e) {
+                System.err.println("Unexpected error: " + e);
                 return false;
             }
         }
