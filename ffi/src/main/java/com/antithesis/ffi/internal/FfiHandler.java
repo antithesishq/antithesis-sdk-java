@@ -2,7 +2,7 @@ package com.antithesis.ffi.internal;
 
 import java.util.Optional;
 
-public class FfiHandler implements OutputHandler, CoverageHandler {
+public class FfiHandler implements OutputHandler {
 
     private static long offset = -1;
 
@@ -24,8 +24,7 @@ public class FfiHandler implements OutputHandler, CoverageHandler {
         return FfiWrapperJNI.fuzz_get_random();
     }
 
-    @Override
-    public long initializeModuleCoverage(long edgeCount, String symbolFilePath) {
+    public static long initializeModuleCoverage(long edgeCount, String symbolFilePath) {
         if (offset != -1) {
             // A Java application may not contain multiple "modules" in Antithesis terms.
             throw new IllegalStateException("Antithesis Java instrumentation has already been initialized.");
@@ -39,8 +38,7 @@ public class FfiHandler implements OutputHandler, CoverageHandler {
         return offset;
     }
 
-    @Override
-    public void notifyModuleEdge(long edgePlusModule) {
+    public static void notifyModuleEdge(long edgePlusModule) {
         FfiWrapperJNI.notify_coverage(edgePlusModule);
     }
 
