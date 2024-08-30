@@ -34,14 +34,13 @@ public class FfiHandler implements OutputHandler, CoverageHandler {
             throw new IllegalArgumentException("Antithesis Java instrumentation supports [1 ," + Integer.MAX_VALUE + "] edges");
         }
         offset = FfiWrapperJNI.init_coverage_module(edgeCount, symbolFilePath);
+        String msg = String.format("Initialized Java module at offset 0x%016x with %d edges; symbol file %s", offset, edgeCount, symbolFilePath);
+        System.out.println(msg);
         return offset;
     }
 
     @Override
     public void notifyModuleEdge(long edgePlusModule) {
-        // Right now, the Java implementation defers completely to the native library.
-        // See instrumentation.h to understand the logic here. The shim (i.e. StaticModule.java)
-        // is responsible for handling the return value.
         FfiWrapperJNI.notify_coverage(edgePlusModule);
     }
 
