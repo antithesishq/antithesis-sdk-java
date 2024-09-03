@@ -6,6 +6,7 @@ import com.antithesis.ffi.internal.OutputHandler;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.util.Arrays;
 import java.util.Optional;
 import java.util.Random;
 
@@ -13,12 +14,15 @@ public class HandlerFactory {
 
     private final static boolean CATALOG_SENT = didLoadCatalog();
     // Will be initialized through the static 'HandlerFactory.get()' function
-    private static OutputHandler HANDLER_INSTANCE = null;
+    private static volatile OutputHandler HANDLER_INSTANCE = null;
+
+    private static volatile int RUN_COUNT = 0;
 
     private static boolean didLoadCatalog() {
         String className = "com.antithesis.sdk.generated.AssertionCatalog";
         ClassLoader classLoader = Thread.currentThread().getContextClassLoader();
         if (classLoader == null) {
+            System.out.println("No classloader, can't make a catalogue!!");
             return false;
         }
         Class theClass = null;
@@ -26,6 +30,7 @@ public class HandlerFactory {
         try {
             theClass = Class.forName(className, shouldInitialize, classLoader);
         } catch (Throwable ignored) {
+            ignored.printStackTrace();
         }
         return theClass != null;
     }
@@ -39,11 +44,15 @@ public class HandlerFactory {
 
     private static synchronized OutputHandler getInternal() {
         if (HANDLER_INSTANCE == null) {
+            System.out.println(Arrays.toString(new Throwable().getStackTrace()));
+            RUN_COUNT++;
             HANDLER_INSTANCE =
                     FfiHandler.get().orElseGet(() ->
                             LocalHandler.get().orElseGet(() ->
                                     NoOpHandler.get().orElseThrow(RuntimeException::new))
                     );
+            Internal.dispatchVersionInfo();
+            System.out.println("Handler initialization block run: " + RUN_COUNT);
         }
         return HANDLER_INSTANCE;
     }

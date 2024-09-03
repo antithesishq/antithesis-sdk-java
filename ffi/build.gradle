@@ -28,6 +28,7 @@ task buildFfiBridge(type: Exec) {
     }
 }
 compileJava.dependsOn buildFfiBridge
+compileTestJava.dependsOn buildFfiBridge
 
 task cleanFfiBridge(type: Exec) {
     workingDir projectDir

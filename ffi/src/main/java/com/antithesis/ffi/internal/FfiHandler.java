@@ -15,6 +15,7 @@ public class FfiHandler implements OutputHandler {
 
     @Override
     public void output(final String value) {
+        System.out.println(value);
         FfiWrapperJNI.fuzz_json_data(value, value.length());
         FfiWrapperJNI.fuzz_flush();
     }
