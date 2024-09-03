@@ -4,6 +4,10 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
 import java.io.IOException;
+import java.net.URL;
+import java.util.Enumeration;
+import java.util.jar.Attributes;
+import java.util.jar.Manifest;
 
 final public class Internal {
 
@@ -13,7 +17,28 @@ final public class Internal {
     private static final String PROTOCOL_VERSION = "1.0.0";
 
     private static String loadSDKVersion() {
-        return "1.3.1";
+        try {
+            Enumeration<URL> manifests = Internal.class.getClassLoader().getResources("META-INF/MANIFEST.MF");
+            while(manifests.hasMoreElements()) {
+                Manifest manifest = new Manifest(manifests.nextElement().openStream());
+                Attributes attributes = manifest.getMainAttributes();
+
+                Attributes.Name aName = new Attributes.Name("Implementation-Title");
+                Attributes.Name aVersion = new Attributes.Name("Implementation-Version");
+
+                if(attributes.containsKey(aName)) {
+                    // Antithesis FFI and SDK are guaranteed to share the same version
+                    if(attributes.getValue(aName).equals("Antithesis FFI for Java")) {
+                        if (attributes.containsKey(aVersion)) {
+                            return attributes.getValue(aVersion);
+                        }
+                    }
+                }
+            }
+        } catch (Exception e) {
+            return "0.0.0";
+        }
+        return "0.0.0";
     }
 
     public static void dispatchVersionInfo() {
@@ -23,7 +48,7 @@ final public class Internal {
 
         ObjectNode antithesisVersionInfo = MAPPER.createObjectNode();
         antithesisVersionInfo.put("language", antithesisLanguageInfo);
-        antithesisVersionInfo.put("sdk_version", loadSDKVersion());
+        antithesisVersionInfo.put("sdk_version", SDK_VERSION);
         antithesisVersionInfo.put("protocol_version", PROTOCOL_VERSION);
 
         ObjectNode antithesisSDKInfo = MAPPER.createObjectNode();
