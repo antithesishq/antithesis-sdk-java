@@ -41,6 +41,7 @@ final public class Internal {
                         if (attributes.containsKey(aProtocol)) {
                             protocolVersion = attributes.getValue(aProtocol);
                         }
+                        break;  // no sense in looking any further
                     }
                 }
             }
