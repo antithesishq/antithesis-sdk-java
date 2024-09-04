@@ -12,13 +12,13 @@ public class RandomTest {
     @Test
     void randomNoChoice() {
         String[] arr = {};
-        assertEquals(Random.randomChoice(arr), Optional.empty());
+        assertEquals(Random.randomChoice(arr), null);
     }
 
     @Test
     void randomOneChoice() {
         String[] arr = {"ABc"};
-        assertEquals(Random.randomChoice(arr), Optional.of("ABc"));
+        assertEquals(Random.randomChoice(arr), "ABc");
     }
 
     @Test
@@ -34,10 +34,10 @@ public class RandomTest {
         Character[] all_keys = counted_items.keySet().toArray(new Character[0]);
         assertEquals(counted_items.size(), all_keys.length);
         for (int i = 0; i < 25; i++) {
-            Optional<Character> rc = Random.randomChoice(all_keys);
-            if (rc.isPresent()) {
-                Character choice = rc.get();
-                counted_items.computeIfPresent(choice, (key, val) -> val + 1);
+            Character rc = Random.randomChoice(all_keys);
+            if (rc != null) {
+                Character choice = rc;
+                counted_items.compute(choice, (key, val) -> val + 1);
             }
         }
         counted_items.forEach((key, val) -> assertNotEquals(val, 0, String.format("Did not produce the choice: %c", key)));

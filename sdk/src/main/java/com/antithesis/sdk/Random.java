@@ -46,16 +46,19 @@ final public class Random {
      * @param <T>   Type of the array member items
      * @return Randomly selected item from the provided array.
      */
-    public static <T> Optional<T> randomChoice(T[] array) {
+    //public static <T> Optional<T> randomChoice(T[] array) {
+    public static <T> T randomChoice(T[] array) {
         if (array.length == 0) {
-            return Optional.empty();
+            return null; // Optional.empty();
         } else if (array.length == 1) {
-            return Optional.of(array[0]);
+            // return Optional.of(array[0]);
+            return array[0];
         } else {
             // Safety: Result of modulo is always less than the divisor
             // and will always fit into an integer
             int idx = (int) Long.remainderUnsigned(getRandom(), array.length);
-            return Optional.of(array[idx]);
+            // return Optional.of(array[idx]);
+            return array[idx];
         }
     }
 }
