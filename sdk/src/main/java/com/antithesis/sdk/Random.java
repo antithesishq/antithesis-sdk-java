@@ -2,7 +2,7 @@ package com.antithesis.sdk;
 
 import com.antithesis.sdk.internal.Internal;
 
-import java.util.Optional;
+import java.util.List;
 
 /**
  * The Random class provides methods that request both structured and unstructured randomness from the Antithesis environment.
@@ -42,23 +42,20 @@ final public class Random {
      * in a structured way enables it to provide more interesting
      * choices over time.
      *
-     * @param array An array of items to select from
-     * @param <T>   Type of the array member items
-     * @return Randomly selected item from the provided array.
+     * @param list An array of items to select from
+     * @param <T>  Type of the array member items
+     * @return Randomly selected item from the provided list.
      */
-    //public static <T> Optional<T> randomChoice(T[] array) {
-    public static <T> T randomChoice(T[] array) {
-        if (array.length == 0) {
-            return null; // Optional.empty();
-        } else if (array.length == 1) {
-            // return Optional.of(array[0]);
-            return array[0];
+    public static <T> T randomChoice(List<T> list) {
+        if (list.isEmpty()) {
+            return null;
+        } else if (list.size() == 1) {
+            return list.get(0);
         } else {
             // Safety: Result of modulo is always less than the divisor
             // and will always fit into an integer
-            int idx = (int) Long.remainderUnsigned(getRandom(), array.length);
-            // return Optional.of(array[idx]);
-            return array[idx];
+            int idx = (int) Long.remainderUnsigned(getRandom(), list.size());
+            return list.get(idx);
         }
     }
 }
