@@ -12,33 +12,44 @@ import java.util.jar.Manifest;
 final public class Internal {
 
     private static final ObjectMapper MAPPER = new ObjectMapper();
-    private static final String SDK_VERSION = loadSDKVersion();
+    private static final String[] SDK_VERSION_INFO = loadSDKVersion();
 
-    private static final String PROTOCOL_VERSION = "1.0.0";
+    private static String[] loadSDKVersion() {
+       
+        String sdkVersion = "0.0.0";
+        String protocolVersion = "0.0.0";
+        String[] info = {sdkVersion, protocolVersion};
 
-    private static String loadSDKVersion() {
         try {
             Enumeration<URL> manifests = Internal.class.getClassLoader().getResources("META-INF/MANIFEST.MF");
-            while(manifests.hasMoreElements()) {
+            while (manifests.hasMoreElements()) {
                 Manifest manifest = new Manifest(manifests.nextElement().openStream());
                 Attributes attributes = manifest.getMainAttributes();
 
-                Attributes.Name aName = new Attributes.Name("Implementation-Title");
+                Attributes.Name aTitle = new Attributes.Name("Implementation-Title");
                 Attributes.Name aVersion = new Attributes.Name("Implementation-Version");
+                Attributes.Name aProtocol = new Attributes.Name("Specification-Version");
 
-                if(attributes.containsKey(aName)) {
+                if (attributes.containsKey(aTitle)) {
+                    String jarTitle = attributes.getValue(aTitle);
                     // Antithesis FFI and SDK are guaranteed to share the same version
-                    if(attributes.getValue(aName).equals("Antithesis FFI for Java")) {
+                    Boolean isFFIManifest = jarTitle.equals("Antithesis FFI for Java");
+                    if (isFFIManifest) {
                         if (attributes.containsKey(aVersion)) {
-                            return attributes.getValue(aVersion);
+                            sdkVersion = attributes.getValue(aVersion);
+                        }
+                        if (attributes.containsKey(aProtocol)) {
+                            protocolVersion = attributes.getValue(aProtocol);
                         }
                     }
                 }
             }
         } catch (Exception e) {
-            return "0.0.0";
+            return info;
         }
-        return "0.0.0";
+        info[0] = sdkVersion;
+        info[1] = protocolVersion;
+        return info;
     }
 
     public static void dispatchVersionInfo() {
@@ -48,8 +59,8 @@ final public class Internal {
 
         ObjectNode antithesisVersionInfo = MAPPER.createObjectNode();
         antithesisVersionInfo.put("language", antithesisLanguageInfo);
-        antithesisVersionInfo.put("sdk_version", SDK_VERSION);
-        antithesisVersionInfo.put("protocol_version", PROTOCOL_VERSION);
+        antithesisVersionInfo.put("sdk_version", SDK_VERSION_INFO[0]);
+        antithesisVersionInfo.put("protocol_version", SDK_VERSION_INFO[1]);
 
         ObjectNode antithesisSDKInfo = MAPPER.createObjectNode();
         antithesisSDKInfo.put("antithesis_sdk", antithesisVersionInfo);
