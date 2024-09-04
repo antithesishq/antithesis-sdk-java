@@ -43,7 +43,6 @@ import java.nio.file.StandardCopyOption;
         boolean nativeLibraryFound = hasNativeLibrary();
         if (nativeLibraryFound) {
             try {
-                System.load(NATIVE_LIBRARY_PATH);
                 File file = File.createTempFile("libFfiWrapper", ".so");
                 try (InputStream link = (Thread.currentThread().getContextClassLoader().getResourceAsStream("libFfiWrapper.so"))){
                     Files.copy(
