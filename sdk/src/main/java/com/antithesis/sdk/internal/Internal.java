@@ -15,7 +15,6 @@ final public class Internal {
     private static final String[] SDK_VERSION_INFO = loadSDKVersion();
 
     private static String[] loadSDKVersion() {
-       
         String sdkVersion = "0.0.0";
         String protocolVersion = "0.0.0";
         String[] info = {sdkVersion, protocolVersion};
@@ -33,7 +32,7 @@ final public class Internal {
                 if (attributes.containsKey(aTitle)) {
                     String jarTitle = attributes.getValue(aTitle);
                     // Antithesis FFI and SDK are guaranteed to share the same version
-                    Boolean isFFIManifest = jarTitle.equals("Antithesis FFI for Java");
+                    boolean isFFIManifest = jarTitle.equals("Antithesis FFI for Java");
                     if (isFFIManifest) {
                         if (attributes.containsKey(aVersion)) {
                             sdkVersion = attributes.getValue(aVersion);
