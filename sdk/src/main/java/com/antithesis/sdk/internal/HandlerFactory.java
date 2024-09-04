@@ -13,18 +13,13 @@ public class HandlerFactory {
 
     private final static boolean CATALOG_SENT = didLoadCatalog();
     // Will be initialized through the static 'HandlerFactory.get()' function
-    private static OutputHandler HANDLER_INSTANCE = null;
+    private static volatile OutputHandler HANDLER_INSTANCE;
 
     private static boolean didLoadCatalog() {
         String className = "com.antithesis.sdk.generated.AssertionCatalog";
-        ClassLoader classLoader = Thread.currentThread().getContextClassLoader();
-        if (classLoader == null) {
-            return false;
-        }
         Class theClass = null;
-        boolean shouldInitialize = true;
         try {
-            theClass = Class.forName(className, shouldInitialize, classLoader);
+            theClass = Class.forName(className);
         } catch (Throwable ignored) {
         }
         return theClass != null;
@@ -44,6 +39,7 @@ public class HandlerFactory {
                             LocalHandler.get().orElseGet(() ->
                                     NoOpHandler.get().orElseThrow(RuntimeException::new))
                     );
+            Internal.dispatchVersionInfo();
         }
         return HANDLER_INSTANCE;
     }

@@ -96,7 +96,10 @@ public final class Assertion {
     }
 
     private void emit() {
-        Internal.dispatchOutput(MAPPER.valueToTree(this));
+        ObjectNode assertionNode = MAPPER.createObjectNode();
+        assertionNode.put("antithesis_assert", MAPPER.valueToTree(this));
+
+        Internal.dispatchOutput(assertionNode);
     }
 
     private static class TrackingInfo {

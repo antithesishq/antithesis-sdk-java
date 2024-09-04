@@ -28,6 +28,7 @@ task buildFfiBridge(type: Exec) {
     }
 }
 compileJava.dependsOn buildFfiBridge
+compileTestJava.dependsOn buildFfiBridge
 
 task cleanFfiBridge(type: Exec) {
     workingDir projectDir
@@ -43,8 +44,10 @@ jar {
     archiveAppendix = 'ffi'
     archiveBaseName = 'antithesis'
     manifest {
-        attributes 'Implementation-Title': 'Antithesis FFI for Java',
+        attributes 'Implementation-Title': 'Antithesis FFI for Java', // !! LOAD BEARING Title
                 'Implementation-Version': "${project.version}",
+                'Specification-Title': 'Antithesis SDK Protocol',
+                'Specification-Version': "${project.property('com.antithesis.sdk.protocol')}",
                 'Created-By': "Gradle ${gradle.gradleVersion}",
                 'Build-Jdk': "${System.properties['java.version']} (${System.properties['java.vendor']} ${System.properties['java.vm.version']})",
                 'Build-OS': "${System.properties['os.name']} ${System.properties['os.arch']} ${System.properties['os.version']}"

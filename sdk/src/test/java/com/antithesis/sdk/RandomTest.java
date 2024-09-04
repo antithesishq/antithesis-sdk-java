@@ -2,23 +2,27 @@ package com.antithesis.sdk;
 
 import org.junit.jupiter.api.Test;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.Optional;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Vector;
 
 import static org.junit.jupiter.api.Assertions.*;
 
 public class RandomTest {
     @Test
     void randomNoChoice() {
-        String[] arr = {};
-        assertEquals(Random.randomChoice(arr), Optional.empty());
+        List<String> list = new ArrayList<>();
+        assertNull(Random.randomChoice(list));
     }
 
     @Test
     void randomOneChoice() {
-        String[] arr = {"ABc"};
-        assertEquals(Random.randomChoice(arr), Optional.of("ABc"));
+        List<String> list = new LinkedList<String>();
+        list.add("ABc");
+        assertEquals(Random.randomChoice(list), "ABc");
     }
 
     @Test
@@ -31,12 +35,11 @@ public class RandomTest {
         counted_items.put('c', 0);
         counted_items.put('d', 0);
 
-        Character[] all_keys = counted_items.keySet().toArray(new Character[0]);
-        assertEquals(counted_items.size(), all_keys.length);
+        List<Character> all_keys = new Vector<>(counted_items.keySet());
+        assertEquals(counted_items.size(), all_keys.size());
         for (int i = 0; i < 25; i++) {
-            Optional<Character> rc = Random.randomChoice(all_keys);
-            if (rc.isPresent()) {
-                Character choice = rc.get();
+            Character choice = Random.randomChoice(all_keys);
+            if (choice != null) {
                 counted_items.computeIfPresent(choice, (key, val) -> val + 1);
             }
         }

@@ -1,4 +1,8 @@
+
 build:
+	@# Verify dependencies are met
+	@command -v swig >/dev/null 2>&1 || { echo ""; echo >&2 "Error: swig is not installed."; echo ""; exit 1; }
+
 	# Generate java and .c files needed for JNI
 	swig -java -package com.antithesis.ffi.internal FfiWrapper.i
 

@@ -7,21 +7,10 @@ public class FfiHandler implements OutputHandler {
     private static long offset = -1;
 
     public static Optional<OutputHandler> get() {
-        if(FfiWrapperJNI.LOAD_LIBRARY_MARKER) {
+        if (FfiWrapperJNI.LOAD_LIBRARY_MARKER) {
             return Optional.of(new FfiHandler());
         }
         return Optional.empty();
-    }
-
-    @Override
-    public void output(final String value) {
-        FfiWrapperJNI.fuzz_json_data(value, value.length());
-        FfiWrapperJNI.fuzz_flush();
-    }
-
-    @Override
-    public long random() {
-        return FfiWrapperJNI.fuzz_get_random();
     }
 
     public static long initializeModuleCoverage(long edgeCount, String symbolFilePath) {
@@ -40,6 +29,17 @@ public class FfiHandler implements OutputHandler {
 
     public static void notifyModuleEdge(long edgePlusModule) {
         FfiWrapperJNI.notify_coverage(edgePlusModule);
+    }
+
+    @Override
+    public void output(final String value) {
+        FfiWrapperJNI.fuzz_json_data(value, value.length());
+        FfiWrapperJNI.fuzz_flush();
+    }
+
+    @Override
+    public long random() {
+        return FfiWrapperJNI.fuzz_get_random();
     }
 
 }
