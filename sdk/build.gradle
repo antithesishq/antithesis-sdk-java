@@ -6,9 +6,10 @@ plugins {
 publishing {
     publications {
         mavenJava(MavenPublication) {
+            artifact jar
             pom {
                 name = 'Antithesis SDK for Java'
-                description = 'This library provides methods for Rust programs to configure the Antithesis platform.'
+                description = 'This library provides methods for Java programs to configure the Antithesis platform.'
                 url = 'https://antithesis.com/docs/using_antithesis/sdk/java/overview.html'
 
                 licenses {
@@ -45,6 +46,7 @@ publishing {
         }
     }
 }
+publish.dependsOn(':ffi:publish')
 
 repositories {
     mavenCentral()
