@@ -2,6 +2,7 @@ package com.antithesis.sdk.internal;
 
 import com.antithesis.ffi.internal.FfiHandler;
 import com.antithesis.ffi.internal.OutputHandler;
+import com.antithesis.ffi.internal.FfiWrapperJNI;
 
 import java.io.File;
 import java.io.FileWriter;
@@ -21,6 +22,9 @@ public class HandlerFactory {
         try {
             theClass = Class.forName(className);
         } catch (Throwable ignored) {
+            if(FfiWrapperJNI.LOAD_LIBRARY_MARKER) {
+                ignored.printStackTrace();
+            }
         }
         return theClass != null;
     }
@@ -35,10 +39,10 @@ public class HandlerFactory {
     private static synchronized OutputHandler getInternal() {
         if (HANDLER_INSTANCE == null) {
             HANDLER_INSTANCE =
-                    FfiHandler.get().orElseGet(() ->
-                            LocalHandler.get().orElseGet(() ->
-                                    NoOpHandler.get().orElseThrow(RuntimeException::new))
-                    );
+                FfiHandler.get().orElseGet(() ->
+                        LocalHandler.get().orElseGet(() ->
+                                NoOpHandler.get().orElseThrow(RuntimeException::new))
+                );
             Internal.dispatchVersionInfo();
         }
         return HANDLER_INSTANCE;

@@ -37,7 +37,7 @@ import java.nio.file.StandardCopyOption;
     }
 
     // Static variables initialization is guaranteed to execute by the Java Language Spec
-    public static boolean LOAD_LIBRARY_MARKER = loadLibrary();
+    public static final boolean LOAD_LIBRARY_MARKER = loadLibrary();
 
     private static boolean loadLibrary() {
         boolean nativeLibraryFound = hasNativeLibrary();
