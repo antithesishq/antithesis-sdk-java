@@ -1,5 +1,6 @@
 plugins {
     id 'java-library'
+    id 'maven-publish'
 }
 
 repositories {
@@ -10,6 +11,51 @@ dependencies {
   // none
 }
 
+String implementationTitle = 'Antithesis FFI for Java' // !! LOAD BEARING Title: used by com.antithesis.sdk.internal.loadSDKVersion
+
+publishing {
+    publications {
+        mavenJava(MavenPublication) {
+            artifact jar
+            pom {
+                name = "${implementationTitle}"
+                description = 'This internal library provides methods for Java programs to interface with Antithesis platform.'
+                url = 'https://antithesis.com/docs/using_antithesis/sdk/java/overview.html'
+
+                licenses {
+                    license {
+                        name = 'MIT License'
+                        url = 'https://github.com/antithesishq/antithesis-sdk-java/blob/main/LICENSE'
+                    }
+                }
+
+                developers {
+                    developer {
+                        id = 'Antithesis'
+                        name = 'Antithesis HQ'
+                        email = 'noreply@antithesis.com'
+                    }
+                }
+
+                scm {
+                    connection = 'scm:git:git://github.com/antithesishq/antithesis-sdk-java.git'
+                    developerConnection = 'scm:git:ssh://github.com/antithesishq/antithesis-sdk-java.git'
+                    url = 'https://github.com/antithesishq/antithesis-sdk-java'
+                }
+            }
+        }
+    }
+    repositories {
+        maven {
+            name = "OSSRH"
+            url = "https://oss.sonatype.org/service/local/staging/deploy/maven2/"
+            credentials {
+                username = System.getenv("MAVEN_USERNAME")
+                password = System.getenv("MAVEN_PASSWORD")
+            }
+        }
+    }
+}
 
 compileJava {
     sourceCompatibility = 1.8
@@ -44,7 +90,7 @@ jar {
     archiveAppendix = 'ffi'
     archiveBaseName = 'antithesis'
     manifest {
-        attributes 'Implementation-Title': 'Antithesis FFI for Java', // !! LOAD BEARING Title
+        attributes 'Implementation-Title': "${implementationTitle}",
                 'Implementation-Version': "${project.version}",
                 'Specification-Title': 'Antithesis SDK Protocol',
                 'Specification-Version': "${project.property('com.antithesis.sdk.protocol')}",

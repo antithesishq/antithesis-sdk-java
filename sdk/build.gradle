@@ -1,13 +1,61 @@
 plugins {
     id 'java-library'
+    id 'maven-publish'
 }
+
+String implementationTitle = 'Antithesis SDK for Java'
+
+publishing {
+    publications {
+        mavenJava(MavenPublication) {
+            artifact jar
+            pom {
+                name = "${implementationTitle}"
+                description = 'This library provides methods for Java programs to configure the Antithesis platform.'
+                url = 'https://antithesis.com/docs/using_antithesis/sdk/java/overview.html'
+
+                licenses {
+                    license {
+                        name = 'MIT License'
+                        url = 'https://github.com/antithesishq/antithesis-sdk-java/blob/main/LICENSE'
+                    }
+                }
+
+                developers {
+                    developer {
+                        id = 'Antithesis'
+                        name = 'Antithesis HQ'
+                        email = 'noreply@antithesis.com'
+                    }
+                }
+
+                scm {
+                    connection = 'scm:git:git://github.com/antithesishq/antithesis-sdk-java.git'
+                    developerConnection = 'scm:git:ssh://github.com/antithesishq/antithesis-sdk-java.git'
+                    url = 'https://github.com/antithesishq/antithesis-sdk-java'
+                }
+            }
+        }
+    }
+    repositories {
+        maven {
+            name = "OSSRH"
+            url = "https://oss.sonatype.org/service/local/staging/deploy/maven2/"
+            credentials {
+                username = System.getenv("MAVEN_USERNAME")
+                password = System.getenv("MAVEN_PASSWORD")
+            }
+        }
+    }
+}
+publish.dependsOn(':ffi:publish')
 
 repositories {
     mavenCentral()
 }
 
 dependencies {
-    api 'com.fasterxml.jackson.core:jackson-databind:2.2.3'
+    implementation 'com.fasterxml.jackson.core:jackson-databind:2.2.3'
 
     if (file("libs/antithesis-ffi-${project.version}.jar").isFile()) {
         implementation(files("libs/antithesis-ffi-${project.version}.jar"))
@@ -15,13 +63,13 @@ dependencies {
         implementation(project(":ffi"))
     }
 
+    compileOnly 'org.projectlombok:lombok:1.18.34'
+    annotationProcessor 'org.projectlombok:lombok:1.18.34'
+
     // Use JUnit Jupiter for testing.
     testImplementation 'org.junit.jupiter:junit-jupiter:5.9.3'
     testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
     testImplementation 'com.fasterxml.jackson.core:jackson-databind:2.2.3'
-
-    compileOnly 'org.projectlombok:lombok:1.18.34'
-    annotationProcessor 'org.projectlombok:lombok:1.18.34'
 
     testCompileOnly 'org.projectlombok:lombok:1.18.34'
     testAnnotationProcessor 'org.projectlombok:lombok:1.18.34'
@@ -38,7 +86,7 @@ jar {
     archiveBaseName = 'antithesis'
     archiveAppendix = 'sdk'
     manifest {
-        attributes 'Implementation-Title': 'Antithesis SDK for Java',
+        attributes 'Implementation-Title': "${implementationTitle}",
                 'Implementation-Version': "${project.version}",
                 'Created-By': "Gradle ${gradle.gradleVersion}",
                 'Build-Jdk': "${System.properties['java.version']} (${System.properties['java.vendor']} ${System.properties['java.vm.version']})",
@@ -59,7 +107,7 @@ task generateJavadoc(type: Javadoc) {
     source = sourceSets.main.allJava
     exclude 'com/antithesis/sdk/internal/**'
 
-    // Hack to enable Javadoc to compile while exclude internal functions
+    // Hack to enable Javadoc to compile while excluding internal functions
     var sourceSetDirectories = sourceSets.main.java.srcDirs.join(":")
     options.addStringOption("sourcepath", sourceSetDirectories)
 
