@@ -23,7 +23,7 @@ publishing {
                 licenses {
                     license {
                         name = 'MIT License'
-                        url = 'https://choosealicense.com/licenses/mit/'
+                        url = 'https://github.com/antithesishq/antithesis-sdk-java/blob/main/LICENSE'
                     }
                 }
 
