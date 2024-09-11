@@ -11,12 +11,14 @@ dependencies {
   // none
 }
 
+String implementationTitle = 'Antithesis FFI for Java' // !! LOAD BEARING Title: used by com.antithesis.sdk.internal.loadSDKVersion
+
 publishing {
     publications {
         mavenJava(MavenPublication) {
             artifact jar
             pom {
-                name = 'Antithesis FFI for Java'
+                name = "${implementationTitle}"
                 description = 'This internal library provides methods for Java programs to interface with Antithesis platform.'
                 url = 'https://antithesis.com/docs/using_antithesis/sdk/java/overview.html'
 
@@ -88,7 +90,7 @@ jar {
     archiveAppendix = 'ffi'
     archiveBaseName = 'antithesis'
     manifest {
-        attributes 'Implementation-Title': 'Antithesis FFI for Java', // !! LOAD BEARING Title
+        attributes 'Implementation-Title': "${implementationTitle}",
                 'Implementation-Version': "${project.version}",
                 'Specification-Title': 'Antithesis SDK Protocol',
                 'Specification-Version': "${project.property('com.antithesis.sdk.protocol')}",

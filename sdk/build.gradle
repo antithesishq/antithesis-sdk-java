@@ -8,7 +8,6 @@ publishing {
         mavenJava(MavenPublication) {
             artifact jar
             pom {
-                name = 'Antithesis SDK for Java'
                 description = 'This library provides methods for Java programs to configure the Antithesis platform.'
                 url = 'https://antithesis.com/docs/using_antithesis/sdk/java/overview.html'
 
