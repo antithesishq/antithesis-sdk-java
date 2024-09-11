@@ -65,6 +65,7 @@ compileJava {
 
 task buildFfiBridge(type: Exec) {
     workingDir projectDir
+    environment.putIfAbsent("JAVA_HOME", System.properties['java.home'])
     if (file("./ffi_build.sh").isFile()) {
         commandLine 'sh', '-c', './ffi_build.sh'
     }

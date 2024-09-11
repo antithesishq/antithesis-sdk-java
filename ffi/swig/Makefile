@@ -1,4 +1,3 @@
-
 build:
 	@# Verify dependencies are met
 	@command -v swig >/dev/null 2>&1 || { echo ""; echo >&2 "Error: swig is not installed."; echo ""; exit 1; }
@@ -9,8 +8,11 @@ build:
 	# Copy the generated java files to the internal package
 	cp FfiWrapperJNI.java ../src/main/java/com/antithesis/ffi/internal
 
+	[ x`uname` == x'Linux' ] && $(MAKE) build-jni
+
+build-jni:
 	# Create the wrapper DSO used by JNI to access libvoidstar
-	${CC} -I"${JAVA_HOME}\include" -I . -shared -o libFfiWrapper.so *.c
+	${CC} -I"${JAVA_HOME}/include" -I . -shared -o libFfiWrapper.so *.c
 
 	# Add a dependency which ldd will try to resolve at runtime
 	# ldd will fail to resolve this outside of the Antithesis runtime environment
