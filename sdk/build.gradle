@@ -3,11 +3,14 @@ plugins {
     id 'maven-publish'
 }
 
+String implementationTitle = 'Antithesis SDK for Java'
+
 publishing {
     publications {
         mavenJava(MavenPublication) {
             artifact jar
             pom {
+                name = "${implementationTitle}"
                 description = 'This library provides methods for Java programs to configure the Antithesis platform.'
                 url = 'https://antithesis.com/docs/using_antithesis/sdk/java/overview.html'
 
@@ -83,7 +86,7 @@ jar {
     archiveBaseName = 'antithesis'
     archiveAppendix = 'sdk'
     manifest {
-        attributes 'Implementation-Title': 'Antithesis SDK for Java',
+        attributes 'Implementation-Title': "${implementationTitle}",
                 'Implementation-Version': "${project.version}",
                 'Created-By': "Gradle ${gradle.gradleVersion}",
                 'Build-Jdk': "${System.properties['java.version']} (${System.properties['java.vendor']} ${System.properties['java.vm.version']})",
