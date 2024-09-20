@@ -13,10 +13,15 @@ dependencies {
 
 String implementationTitle = 'Antithesis FFI for Java' // !! LOAD BEARING Title: used by com.antithesis.sdk.internal.loadSDKVersion
 
+java {
+    withJavadocJar()
+    withSourcesJar()
+}
+
 publishing {
     publications {
-        mavenJava(MavenPublication) {
-            artifact jar
+        ffi(MavenPublication) {
+            from components.java
             pom {
                 name = "${implementationTitle}"
                 description = 'This internal library provides methods for Java programs to interface with Antithesis platform.'
@@ -47,12 +52,7 @@ publishing {
     }
     repositories {
         maven {
-            name = "OSSRH"
-            url = "https://oss.sonatype.org/service/local/staging/deploy/maven2/"
-            credentials {
-                username = System.getenv("MAVEN_USERNAME")
-                password = System.getenv("MAVEN_PASSWORD")
-            }
+            url = layout.buildDirectory.dir('staging-deploy')
         }
     }
 }

@@ -5,10 +5,15 @@ plugins {
 
 String implementationTitle = 'Antithesis SDK for Java'
 
+java {
+    withJavadocJar()
+    withSourcesJar()
+}
+
 publishing {
     publications {
-        mavenJava(MavenPublication) {
-            artifact jar
+        sdk(MavenPublication) {
+            from components.java
             pom {
                 name = "${implementationTitle}"
                 description = 'This library provides methods for Java programs to configure the Antithesis platform.'
@@ -39,12 +44,7 @@ publishing {
     }
     repositories {
         maven {
-            name = "OSSRH"
-            url = "https://oss.sonatype.org/service/local/staging/deploy/maven2/"
-            credentials {
-                username = System.getenv("MAVEN_USERNAME")
-                password = System.getenv("MAVEN_PASSWORD")
-            }
+            url = layout.buildDirectory.dir('staging-deploy')
         }
     }
 }
