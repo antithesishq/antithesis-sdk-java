@@ -1,6 +1,7 @@
 plugins {
     id 'java-library'
     id 'maven-publish'
+    id 'org.jreleaser' version '1.14.0'
 }
 
 repositories {
@@ -21,6 +22,9 @@ java {
 publishing {
     publications {
         ffi(MavenPublication) {
+            groupId = 'com.antithesis'
+            artifactId = 'ffi'
+
             from components.java
             pom {
                 name = "${implementationTitle}"
@@ -53,6 +57,26 @@ publishing {
     repositories {
         maven {
             url = layout.buildDirectory.dir('staging-deploy')
+        }
+    }
+}
+
+jreleaser {
+    gitRootSearch = true
+    signing {
+        active = 'ALWAYS'
+        armored = true
+    }
+    deploy {
+        maven {
+            mavenCentral {
+                sonatype {
+                applyMavenCentralRules = true
+                    active = 'ALWAYS'
+                    url = 'https://central.sonatype.com/api/v1/publisher'
+                    stagingRepository('build/staging-deploy')
+                }
+            }
         }
     }
 }

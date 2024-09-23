@@ -1,6 +1,7 @@
 plugins {
     id 'java-library'
     id 'maven-publish'
+    id 'org.jreleaser' version '1.14.0'
 }
 
 String implementationTitle = 'Antithesis SDK for Java'
@@ -13,6 +14,9 @@ java {
 publishing {
     publications {
         sdk(MavenPublication) {
+            groupId = 'com.antithesis'
+            artifactId = 'sdk'
+
             from components.java
             pom {
                 name = "${implementationTitle}"
@@ -49,6 +53,27 @@ publishing {
     }
 }
 publish.dependsOn(':ffi:publish')
+
+jreleaser {
+    gitRootSearch = true
+    signing {
+        active = 'ALWAYS'
+        armored = true
+    }
+    deploy {
+        maven {
+            mavenCentral {
+                sonatype {
+                applyMavenCentralRules = true
+                    active = 'ALWAYS'
+                    url = 'https://central.sonatype.com/api/v1/publisher'
+                    stagingRepository('build/staging-deploy')
+                }
+            }
+        }
+    }
+}
+jreleaserFullRelease.dependsOn(':ffi:jreleaserFullRelease')
 
 repositories {
     mavenCentral()
