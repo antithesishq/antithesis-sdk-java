@@ -64,7 +64,7 @@ jreleaser {
         maven {
             mavenCentral {
                 sonatype {
-                applyMavenCentralRules = true
+                    applyMavenCentralRules = true
                     active = 'ALWAYS'
                     url = 'https://central.sonatype.com/api/v1/publisher'
                     stagingRepository('build/staging-deploy')
@@ -73,6 +73,7 @@ jreleaser {
         }
     }
 }
+jreleaserFullRelease.dependsOn(publish)
 jreleaserFullRelease.dependsOn(':ffi:jreleaserFullRelease')
 
 repositories {
