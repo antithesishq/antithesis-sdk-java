@@ -140,7 +140,7 @@ task generateJavadoc(type: Javadoc) {
     classpath = sourceSets.main.compileClasspath
     destinationDir = file("${buildDir}/docs/javadoc")
 }
-build.dependsOn generateJavadoc
+javadocJar.dependsOn generateJavadoc
 
 test {
     testLogging {

@@ -14,6 +14,19 @@ dependencies {
 
 String implementationTitle = 'Antithesis FFI for Java' // !! LOAD BEARING Title: used by com.antithesis.sdk.internal.loadSDKVersion
 
+// Custom Javadoc task configuration
+tasks.named('javadoc', Javadoc) {
+    source = sourceSets.main.allJava
+    exclude 'com.antithesis.sdk.internal.**'
+
+    // Hack to enable Javadoc to compile while excluding internal functions
+    var sourceSetDirectories = sourceSets.main.java.srcDirs.join(":")
+    options.addStringOption("sourcepath", sourceSetDirectories)
+
+    classpath = sourceSets.main.compileClasspath
+    destinationDir = file("${buildDir}/docs/javadoc")
+}
+
 java {
     withJavadocJar()
     withSourcesJar()
@@ -119,7 +132,7 @@ jar {
         attributes 'Implementation-Title': "${implementationTitle}",
                 'Implementation-Version': "${project.version}",
                 'Specification-Title': 'Antithesis SDK Protocol',
-                'Specification-Version': "${project.property('com.antithesis.sdk.protocol')}",
+                'Specification-Version': "${project.findProperty('com.antithesis.sdk.protocol') ?: '0.0.0'}",
                 'Created-By': "Gradle ${gradle.gradleVersion}",
                 'Build-Jdk': "${System.properties['java.version']} (${System.properties['java.vendor']} ${System.properties['java.vm.version']})",
                 'Build-OS': "${System.properties['os.name']} ${System.properties['os.arch']} ${System.properties['os.version']}"
