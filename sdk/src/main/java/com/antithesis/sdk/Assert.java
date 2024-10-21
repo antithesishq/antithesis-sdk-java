@@ -1,7 +1,11 @@
 package com.antithesis.sdk;
 
+import java.util.Map;
+
 import com.antithesis.sdk.internal.Assertion;
+import com.antithesis.sdk.internal.Guidance;
 import com.antithesis.sdk.internal.LocationInfo;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
 /**
@@ -37,6 +41,10 @@ final public class Assert {
      *                  for assertion success/failure.  Evaluated at runtime.
      */
     public static void always(final boolean condition, final String message, final ObjectNode details) {
+        alwaysHelper(condition, message, details);
+    }
+
+    private static void alwaysHelper(final boolean condition, final String message, final ObjectNode details) {
         Assertion.builder()
                 .assertType(AssertType.Always)
                 .condition(condition)
@@ -94,6 +102,10 @@ final public class Assert {
      *                  for assertion success/failure.  Evaluated at runtime.
      */
     public static void sometimes(final boolean condition, final String message, final ObjectNode details) {
+        sometimesHelper(condition, message, details);
+    }
+
+    private static void sometimesHelper(final boolean condition, final String message, final ObjectNode details) {
         Assertion.builder()
                 .assertType(AssertType.Sometimes)
                 .condition(condition)
@@ -251,5 +263,321 @@ final public class Assert {
          * Indicates if an assertion should be encountered
          */
         Reachability
+    }
+
+    /**
+     * @hidden
+     */
+    public enum GuidanceType {
+        Numeric,
+        Boolean,
+        Json
+    }
+
+    /**
+     * @hidden
+     */
+    public static void rawGuidance(
+        final GuidanceType guidanceType,
+        final ObjectNode guidanceData,
+        final boolean maximize,
+        final String className,
+        final String functionName,
+        final String fileName,
+        final int beginLine,
+        final int beginColumn,
+        final String id,
+        final String message,
+        final boolean hit
+    ) {
+        LocationInfo location = LocationInfo.builder()
+                .beginColumn(beginColumn)
+                .beginLine(beginLine)
+                .className(className)
+                .fileName(fileName)
+                .functionName(functionName)
+                .build();
+        Guidance.builder()
+                .guidanceType(guidanceType)
+                .id(id)
+                .message(message)
+                .location(location)
+                .maximize(maximize)
+                .data(guidanceData)
+                .hit(hit)
+                .build()
+                .trackEntry();
+    }
+
+    private static void guidanceHelper(
+        final GuidanceType guidanceType,
+        final ObjectNode guidanceData,
+        final boolean maximize,
+        final String message
+    ) {
+        Guidance.builder()
+                .guidanceType(guidanceType)
+                .id(message)
+                .message(message)
+                .location(Assertion.getLocationInfo(message))
+                .maximize(maximize)
+                .data(guidanceData)
+                .hit(true)
+                .build()
+                .trackEntry();
+    }
+
+    /**
+     * {@code alwaysGreaterThan(x, y, ...)} is mostly equivalent to {@code always(x > y, ...)}.
+     * Additionally Antithesis has more visibility to the value of {@code x} and {@code y},
+     * and the assertion details would be merged with {@code {"left": x, "right": y}}.
+     *
+     * @param <T>      the numeric type that we are comparing in.
+     * @param left     the left-hand-side of the comparison.
+     * @param right    the right-hand-side of the comparison.
+     * @param message  a unique string identifier of the assertion.
+     *                 Provides context for assertion success/failure
+     *                 and is intended to be human-readable.  Must be
+     *                 provided as a string literal.
+     * @param details  additional details that provide greater context
+     *                 for assertion success/failure.  Evaluated at runtime.
+     * @see Assert#always always
+     */
+    public static <T extends Number> void alwaysGreaterThan(final T left, final T right, final String message, final ObjectNode details) {
+        double leftValue = left.doubleValue();
+        double rightValue = right.doubleValue();
+        ObjectNode guidanceData = new ObjectMapper().createObjectNode().put("left", leftValue).put("right", rightValue);
+        ObjectNode detailsExtended = (ObjectNode) details.setAll(guidanceData);
+        alwaysHelper(leftValue > rightValue, message, detailsExtended);
+        guidanceHelper(GuidanceType.Numeric, guidanceData, false, message);
+    }
+
+    /**
+     * {@code alwaysGreaterThanOrEqualTo(x, y, ...)} is mostly equivalent to {@code always(x >= y, ...)}.
+     * Additionally Antithesis has more visibility to the value of {@code x} and {@code y},
+     * and the assertion details would be merged with {@code {"left": x, "right": y}}.
+     *
+     * @param <T>      the numeric type that we are comparing in.
+     * @param left     the left-hand-side of the comparison.
+     * @param right    the right-hand-side of the comparison.
+     * @param message  a unique string identifier of the assertion.
+     *                 Provides context for assertion success/failure
+     *                 and is intended to be human-readable.  Must be
+     *                 provided as a string literal.
+     * @param details  additional details that provide greater context
+     *                 for assertion success/failure.  Evaluated at runtime.
+     * @see Assert#always always
+     */
+    public static <T extends Number> void alwaysGreaterThanOrEqualTo(final T left, final T right, final String message, final ObjectNode details) {
+        double leftValue = left.doubleValue();
+        double rightValue = right.doubleValue();
+        ObjectNode guidanceData = new ObjectMapper().createObjectNode().put("left", leftValue).put("right", rightValue);
+        ObjectNode detailsExtended = (ObjectNode) details.setAll(guidanceData);
+        alwaysHelper(leftValue >= rightValue, message, detailsExtended);
+        guidanceHelper(GuidanceType.Numeric, guidanceData, false, message);
+    }
+
+    /**
+     * {@code alwaysLessThan(x, y, ...)} is mostly equivalent to {@code always(x < y, ...)}.
+     * Additionally Antithesis has more visibility to the value of {@code x} and {@code y},
+     * and the assertion details would be merged with {@code {"left": x, "right": y}}.
+     *
+     * @param <T>      the numeric type that we are comparing in.
+     * @param left     the left-hand-side of the comparison.
+     * @param right    the right-hand-side of the comparison.
+     * @param message  a unique string identifier of the assertion.
+     *                 Provides context for assertion success/failure
+     *                 and is intended to be human-readable.  Must be
+     *                 provided as a string literal.
+     * @param details  additional details that provide greater context
+     *                 for assertion success/failure.  Evaluated at runtime.
+     * @see Assert#always always
+     */
+    public static <T extends Number> void alwaysLessThan(final T left, final T right, final String message, final ObjectNode details) {
+        double leftValue = left.doubleValue();
+        double rightValue = right.doubleValue();
+        ObjectNode guidanceData = new ObjectMapper().createObjectNode().put("left", leftValue).put("right", rightValue);
+        ObjectNode detailsExtended = (ObjectNode) details.setAll(guidanceData);
+        alwaysHelper(leftValue < rightValue, message, detailsExtended);
+        guidanceHelper(GuidanceType.Numeric, guidanceData, true, message);
+    }
+
+    /**
+     * {@code alwaysLessThanOrEqualTo(x, y, ...)} is mostly equivalent to {@code always(x <= y, ...)}.
+     * Additionally Antithesis has more visibility to the value of {@code x} and {@code y},
+     * and the assertion details would be merged with {@code {"left": x, "right": y}}.
+     *
+     * @param <T>      the numeric type that we are comparing in.
+     * @param left     the left-hand-side of the comparison.
+     * @param right    the right-hand-side of the comparison.
+     * @param message  a unique string identifier of the assertion.
+     *                 Provides context for assertion success/failure
+     *                 and is intended to be human-readable.  Must be
+     *                 provided as a string literal.
+     * @param details  additional details that provide greater context
+     *                 for assertion success/failure.  Evaluated at runtime.
+     * @see Assert#always always
+     */
+    public static <T extends Number> void alwaysLessThanOrEqualTo(final T left, final T right, final String message, final ObjectNode details) {
+        double leftValue = left.doubleValue();
+        double rightValue = right.doubleValue();
+        ObjectNode guidanceData = new ObjectMapper().createObjectNode().put("left", leftValue).put("right", rightValue);
+        ObjectNode detailsExtended = (ObjectNode) details.setAll(guidanceData);
+        alwaysHelper(leftValue <= rightValue, message, detailsExtended);
+        guidanceHelper(GuidanceType.Numeric, guidanceData, true, message);
+    }
+
+    /**
+     * {@code sometimesGreaterThan(x, y, ...)} is mostly equivalent to {@code sometimes(x > y, ...)}.
+     * Additionally Antithesis has more visibility to the value of {@code x} and {@code y},
+     * and the assertion details would be merged with {@code {"left": x, "right": y}}.
+     *
+     * @param <T>      the numeric type that we are comparing in.
+     * @param left     the left-hand-side of the comparison.
+     * @param right    the right-hand-side of the comparison.
+     * @param message  a unique string identifier of the assertion.
+     *                 Provides context for assertion success/failure
+     *                 and is intended to be human-readable.  Must be
+     *                 provided as a string literal.
+     * @param details  additional details that provide greater context
+     *                 for assertion success/failure.  Evaluated at runtime.
+     * @see Assert#sometimes sometimes
+     */
+    public static <T extends Number> void sometimesGreaterThan(final T left, final T right, final String message, final ObjectNode details) {
+        double leftValue = left.doubleValue();
+        double rightValue = right.doubleValue();
+        ObjectNode guidanceData = new ObjectMapper().createObjectNode().put("left", leftValue).put("right", rightValue);
+        ObjectNode detailsExtended = (ObjectNode) details.setAll(guidanceData);
+        sometimesHelper(leftValue > rightValue, message, detailsExtended);
+        guidanceHelper(GuidanceType.Numeric, guidanceData, false, message);
+    }
+
+    /**
+     * {@code sometimesGreaterThanOrEqualTo(x, y, ...)} is mostly equivalent to {@code sometimes(x >= y, ...)}.
+     * Additionally Antithesis has more visibility to the value of {@code x} and {@code y},
+     * and the assertion details would be merged with {@code {"left": x, "right": y}}.
+     *
+     * @param <T>      the numeric type that we are comparing in.
+     * @param left     the left-hand-side of the comparison.
+     * @param right    the right-hand-side of the comparison.
+     * @param message  a unique string identifier of the assertion.
+     *                 Provides context for assertion success/failure
+     *                 and is intended to be human-readable.  Must be
+     *                 provided as a string literal.
+     * @param details  additional details that provide greater context
+     *                 for assertion success/failure.  Evaluated at runtime.
+     * @see Assert#sometimes sometimes
+     */
+    public static <T extends Number> void sometimesGreaterThanOrEqualTo(final T left, final T right, final String message, final ObjectNode details) {
+        double leftValue = left.doubleValue();
+        double rightValue = right.doubleValue();
+        ObjectNode guidanceData = new ObjectMapper().createObjectNode().put("left", leftValue).put("right", rightValue);
+        ObjectNode detailsExtended = (ObjectNode) details.setAll(guidanceData);
+        sometimesHelper(leftValue >= rightValue, message, detailsExtended);
+        guidanceHelper(GuidanceType.Numeric, guidanceData, false, message);
+    }
+
+    /**
+     * {@code sometimesLessThan(x, y, ...)} is mostly equivalent to {@code sometimes(x < y, ...)}.
+     * Additionally Antithesis has more visibility to the value of {@code x} and {@code y},
+     * and the assertion details would be merged with {@code {"left": x, "right": y}}.
+     *
+     * @param <T>      the numeric type that we are comparing in.
+     * @param left     the left-hand-side of the comparison.
+     * @param right    the right-hand-side of the comparison.
+     * @param message  a unique string identifier of the assertion.
+     *                 Provides context for assertion success/failure
+     *                 and is intended to be human-readable.  Must be
+     *                 provided as a string literal.
+     * @param details  additional details that provide greater context
+     *                 for assertion success/failure.  Evaluated at runtime.
+     * @see Assert#sometimes sometimes
+     */
+    public static <T extends Number> void sometimesLessThan(final T left, final T right, final String message, final ObjectNode details) {
+        double leftValue = left.doubleValue();
+        double rightValue = right.doubleValue();
+        ObjectNode guidanceData = new ObjectMapper().createObjectNode().put("left", leftValue).put("right", rightValue);
+        ObjectNode detailsExtended = (ObjectNode) details.setAll(guidanceData);
+        sometimesHelper(leftValue < rightValue, message, detailsExtended);
+        guidanceHelper(GuidanceType.Numeric, guidanceData, true, message);
+    }
+
+    /**
+     * {@code sometimesLessThanOrEqualTo(x, y, ...)} is mostly equivalent to {@code sometimes(x <= y, ...)}.
+     * Additionally Antithesis has more visibility to the value of {@code x} and {@code y},
+     * and the assertion details would be merged with {@code {"left": x, "right": y}}.
+     *
+     * @param <T>      the numeric type that we are comparing in.
+     * @param left     the left-hand-side of the comparison.
+     * @param right    the right-hand-side of the comparison.
+     * @param message  a unique string identifier of the assertion.
+     *                 Provides context for assertion success/failure
+     *                 and is intended to be human-readable.  Must be
+     *                 provided as a string literal.
+     * @param details  additional details that provide greater context
+     *                 for assertion success/failure.  Evaluated at runtime.
+     * @see Assert#sometimes sometimes
+     */
+    public static <T extends Number> void sometimesLessThanOrEqualTo(final T left, final T right, final String message, final ObjectNode details) {
+        double leftValue = left.doubleValue();
+        double rightValue = right.doubleValue();
+        ObjectNode guidanceData = new ObjectMapper().createObjectNode().put("left", leftValue).put("right", rightValue);
+        ObjectNode detailsExtended = (ObjectNode) details.setAll(guidanceData);
+        sometimesHelper(leftValue <= rightValue, message, detailsExtended);
+        guidanceHelper(GuidanceType.Numeric, guidanceData, true, message);
+    }
+
+    /**
+     * {@code alwaysSome(Map.of("a", x, "b", y, ...), ...)} is similar to {@code always(x || y || ..., ...)}.
+     * Additionally:
+     * <ul>
+     *   <li>Antithesis has more visibility to the individual propositions.</li>
+     *   <li>There is no short-circuiting, so all of {@code x}, {@code y}, ... would be evaluated.</li>
+     *   <li>The assertion details would be merged with {@code {"a": x, "b": y, ...}}.</li>
+     * </ul>
+     *
+     * @param conditions  the collection of conditions to-be disjuncted,
+     *                    represented as a map of booleans indexed by strings.
+     * @param message     a unique string identifier of the assertion.
+     *                    Provides context for assertion success/failure
+     *                    and is intended to be human-readable.  Must be
+     *                    provided as a string literal.
+     * @param details     additional details that provide greater context
+     *                    for assertion success/failure.  Evaluated at runtime.
+     * @see Assert#always always
+    */
+    public static void alwaysSome(final Map<String, Boolean> conditions, final String message, final ObjectNode details) {
+        ObjectNode guidanceData = new ObjectMapper().createObjectNode();
+        conditions.forEach(guidanceData::put);
+        ObjectNode detailsExtended = (ObjectNode) details.setAll(guidanceData);
+        alwaysHelper(conditions.containsValue(true), message, detailsExtended);
+        guidanceHelper(GuidanceType.Boolean, guidanceData, false, message);
+    }
+
+    /**
+     * {@code sometimesAll(Map.of("a", x, "b", y, ...), ...)} is similar to {@code sometimes(x && y && ..., ...)}.
+     * Additionally:
+     * <ul>
+     *   <li>Antithesis has more visibility to the individual propositions.</li>
+     *   <li>There is no short-circuiting, so all of {@code x}, {@code y}, ... would be evaluated.</li>
+     *   <li>The assertion details would be merged with {@code {"a": x, "b": y, ...}}.</li>
+     * </ul>
+     *
+     * @param conditions  the collection of conditions to-be conjuncted,
+     *                    represented as a map of booleans indexed by strings.
+     * @param message     a unique string identifier of the assertion.
+     *                    Provides context for assertion success/failure
+     *                    and is intended to be human-readable.  Must be
+     *                    provided as a string literal.
+     * @param details     additional details that provide greater context
+     *                    for assertion success/failure.  Evaluated at runtime.
+     * @see Assert#sometimes sometimes
+    */
+    public static void sometimesAll(final Map<String, Boolean> conditions, final String message, final ObjectNode details) {
+        ObjectNode guidanceData = new ObjectMapper().createObjectNode();
+        conditions.forEach(guidanceData::put);
+        ObjectNode detailsExtended = (ObjectNode) details.setAll(guidanceData);
+        sometimesHelper(!conditions.containsValue(false), message, detailsExtended);
+        guidanceHelper(GuidanceType.Boolean, guidanceData, true, message);
     }
 }
