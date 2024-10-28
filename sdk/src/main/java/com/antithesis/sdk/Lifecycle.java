@@ -20,7 +20,7 @@ final public class Lifecycle {
      * Indicates to Antithesis that setup has completed. Call this function when
      * your system and workload are fully initialized.
      * After this function is called, Antithesis will take a snapshot of your system
-     * and begin <a href="https://antithesis.com/docs/applications/reliability/fault_injection.html" target="_blank">injecting faults</a>.
+     * and begin <a href="https://antithesis.com/docs/applications/reliability/fault_injection/" target="_blank">injecting faults</a>.
      * <p>
      * Calling this function multiple times or from multiple processes will have no effect.
      * Antithesis will treat the first time any process called this function as

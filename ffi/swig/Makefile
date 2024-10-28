@@ -12,7 +12,7 @@ build:
 
 build-jni:
 	# Create the wrapper DSO used by JNI to access libvoidstar
-	${CC} -I"${JAVA_HOME}/include" -I . -shared -o libFfiWrapper.so *.c
+	${CC} -I"${JAVA_HOME}/include" -I"${JAVA_HOME}/include/linux" -I . -shared -o libFfiWrapper.so *.c
 
 	# Add a dependency which ldd will try to resolve at runtime
 	# ldd will fail to resolve this outside of the Antithesis runtime environment

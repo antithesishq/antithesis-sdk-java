@@ -21,7 +21,7 @@ publishing {
             pom {
                 name = "${implementationTitle}"
                 description = 'This library provides methods for Java programs to configure the Antithesis platform.'
-                url = 'https://antithesis.com/docs/using_antithesis/sdk/java/overview.html'
+                url = 'https://antithesis.com/docs/using_antithesis/sdk/java/overview/'
 
                 licenses {
                     license {
