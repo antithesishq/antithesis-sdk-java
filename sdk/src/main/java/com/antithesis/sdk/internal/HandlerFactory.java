@@ -21,9 +21,13 @@ public class HandlerFactory {
         Class theClass = null;
         try {
             theClass = Class.forName(className);
-        } catch (Throwable ignored) {
             if(FfiWrapperJNI.LOAD_LIBRARY_MARKER) {
-                ignored.printStackTrace();
+                ClassLoader currentClassloader = HandlerFactory.class.getClassLoader();
+                System.err.println(currentClassloader);
+            }
+        } catch (Throwable e) {
+            if(FfiWrapperJNI.LOAD_LIBRARY_MARKER) {
+                e.printStackTrace();
             }
         }
         return theClass != null;
