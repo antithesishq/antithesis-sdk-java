@@ -70,10 +70,10 @@ public final class Guidance {
     }
 
     private void emit() {
-        ObjectNode guidacnNode = MAPPER.createObjectNode();
-        guidacnNode.put("antithesis_guidance", MAPPER.valueToTree(this));
+        ObjectNode guidanceNode = MAPPER.createObjectNode();
+        guidanceNode.put("antithesis_guidance", MAPPER.valueToTree(this));
 
-        Internal.dispatchOutput(guidacnNode);
+        Internal.dispatchOutput(guidanceNode);
     }
 
     private static class NumericTrackingInfo {
@@ -87,7 +87,10 @@ public final class Guidance {
 
         boolean shouldSend(double value) {
             if (maximize ? (mark > value) : (mark < value)) return false;
-            this.mark = value;
+            // Report NaN values, but don't let them update the mark.
+            if (!Double.isNaN(value)) {
+                this.mark = value;
+            }
             return true;
         }
     }
