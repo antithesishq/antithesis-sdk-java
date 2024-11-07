@@ -265,18 +265,12 @@ final public class Assert {
         Reachability
     }
 
-    /**
-     * @hidden
-     */
     public enum GuidanceType {
         Numeric,
         Boolean,
         Json
     }
 
-    /**
-     * @hidden
-     */
     public static void rawGuidance(
         final GuidanceType guidanceType,
         final ObjectNode guidanceData,
