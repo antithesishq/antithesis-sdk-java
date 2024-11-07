@@ -8,7 +8,7 @@ build:
 	# Copy the generated java files to the internal package
 	cp FfiWrapperJNI.java ../src/main/java/com/antithesis/ffi/internal
 
-	[ x`uname` == x'Linux' ] && $(MAKE) build-jni
+	[ "$$(uname -s)" = "Linux" ] && $(MAKE) build-jni
 
 build-jni:
 	# Create the wrapper DSO used by JNI to access libvoidstar
