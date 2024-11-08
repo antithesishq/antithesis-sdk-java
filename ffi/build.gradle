@@ -74,8 +74,14 @@ publishing {
     }
 }
 
+def jreleaserVersion = project.version
+
 jreleaser {
     gitRootSearch = true
+    project {
+        version = jreleaserVersion
+        versionPattern = 'SEMVER'
+    }
     signing {
         active = 'ALWAYS'
         armored = true
