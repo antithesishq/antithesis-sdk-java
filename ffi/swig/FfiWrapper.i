@@ -1,5 +1,7 @@
 %module FfiWrapper
 
+%include "various.i"
+%apply char *BYTE { const char* message }
 %{
 #include <stddef.h>
 #include <stdint.h>

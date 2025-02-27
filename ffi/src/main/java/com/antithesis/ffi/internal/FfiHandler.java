@@ -1,5 +1,6 @@
 package com.antithesis.ffi.internal;
 
+import java.nio.charset.StandardCharsets;
 import java.util.Optional;
 
 public class FfiHandler implements OutputHandler {
@@ -33,7 +34,9 @@ public class FfiHandler implements OutputHandler {
 
     @Override
     public void output(final String value) {
-        FfiWrapperJNI.fuzz_json_data(value, value.length());
+        // `fuzz_json_data` expects length in UTF-8 encoded bytes.
+        byte[] utf8Bytes = value.getBytes(StandardCharsets.UTF_8);
+        FfiWrapperJNI.fuzz_json_data(utf8Bytes, utf8Bytes.length);
         FfiWrapperJNI.fuzz_flush();
     }
 

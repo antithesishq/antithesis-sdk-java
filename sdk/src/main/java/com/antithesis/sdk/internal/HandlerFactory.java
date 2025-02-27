@@ -74,10 +74,13 @@ public class HandlerFactory {
 
         private LocalHandler(final String fileName) {
             this.outFile = new File(fileName);
+
             String fullPath;
             try {
                 fullPath = this.outFile.getAbsolutePath();
             } catch (Throwable e) {
+                System.out.printf("Unable to getAbsolutePath() for '%s'\n", this.outFile.toString());
+                System.out.println(e);
                 fullPath = fileName;
             }
             System.out.printf("Assertion output will be sent to: \"%s\"\n", fullPath);

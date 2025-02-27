@@ -90,9 +90,16 @@ public final class Assertion {
             return value;
         });
 
-        if (trackingInfo.failCount == 1 || trackingInfo.passCount == 1) {
-            emit();
+        if (this.condition) {
+            if (trackingInfo.passCount == 1) {
+                emit();
+            }
+        } else {
+            if (trackingInfo.failCount == 1) {
+                emit();
+            }
         }
+        return;
     }
 
     private void emit() {

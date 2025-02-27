@@ -1,20 +1,5 @@
-{ }:
+{ pkgs, gradle2nix }:
 let
-  pkgs = import (builtins.fetchTarball {
-    name = "nixos-24.05-release";
-    url =
-      "https://github.com/NixOS/nixpkgs/archive/63dacb46bf939521bdc93981b4cbb7ecb58427a0.tar.gz";
-    sha256 = "sha256:1lr1h35prqkd1mkmzriwlpvxcb34kmhc9dnr48gkm8hh089hifmx";
-  }) { };
-
-  # Load the last verified release of Gradle2Nix v2, because the tip has a kotlin DSL mismatch (8.19.24)
-  gradle2nix = (import (builtins.fetchTarball {
-    name = "gradle2nix";
-    url =
-      "https://github.com/tadfisher/gradle2nix/archive/6e37e6e3f91701a633c53a6f06937f714cdcc530.tar.gz";
-    sha256 = "sha256:1viz4jql51dmszmcrxw1cdwcwg9zfmlrvb9z36q7mhb7qc12hcak";
-  }) { inherit pkgs; });
-
   ffi = let
     f_text = builtins.readFile ../gradle.properties;
     f_lines = builtins.split "\n" f_text;
