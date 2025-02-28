@@ -28,4 +28,4 @@ jobs:
 
       - name: Debug
         if: always()
-        run: cat sdk/build/jreleaser/trace.log
+        run: cat /home/runner/work/antithesis-sdk-java/antithesis-sdk-java/ffi/build/jreleaser/trace.log; cat /home/runner/work/antithesis-sdk-java/antithesis-sdk-java/sdk/build/jreleaser/trace.log
