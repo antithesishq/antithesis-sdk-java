@@ -9,8 +9,6 @@ import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.fail;
 import static org.junit.jupiter.api.Assumptions.assumeTrue;
 
-import java.nio.charset.StandardCharsets;
-
 public class InstrumentationTest {
     @Test
     void testRandom() {
@@ -32,8 +30,7 @@ public class InstrumentationTest {
         } catch (JsonProcessingException e) {
             fail(e.getMessage());
         }
-        byte[] utf8Bytes = theString.getBytes(StandardCharsets.UTF_8);
-        FfiWrapperJNI.fuzz_json_data(utf8Bytes, utf8Bytes.length);
+        FfiWrapperJNI.fuzz_json_data(theString, theString.length());
     }
 
     @Test
