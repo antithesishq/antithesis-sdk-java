@@ -27,3 +27,6 @@ jobs:
           JRELEASER_GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           JRELEASER_MAVENCENTRAL_USERNAME: ${{ secrets.OSSRH_USERNAME }}
           JRELEASER_MAVENCENTRAL_TOKEN: ${{ secrets.OSSRH_TOKEN }}
+      - name: Debug
+        if: always()
+        run: cat /home/runner/work/antithesis-sdk-java/antithesis-sdk-java/ffi/build/jreleaser/trace.log; cat /home/runner/work/antithesis-sdk-java/antithesis-sdk-java/sdk/build/jreleaser/trace.log
