@@ -52,7 +52,6 @@ publishing {
         }
     }
 }
-publish.dependsOn(':ffi:publish')
 
 jreleaser {
     gitRootSearch = true
