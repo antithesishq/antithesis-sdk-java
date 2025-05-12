@@ -73,7 +73,6 @@ jreleaser {
     }
 }
 jreleaserFullRelease.dependsOn(publish)
-jreleaserFullRelease.dependsOn(':ffi:jreleaserFullRelease')
 
 repositories {
     mavenCentral()
