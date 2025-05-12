@@ -24,7 +24,7 @@ public class FfiHandler implements OutputHandler {
         }
         offset = FfiWrapperJNI.init_coverage_module(edgeCount, symbolFilePath);
         String msg = String.format("Initialized Java module at offset 0x%016x with %d edges; symbol file %s", offset, edgeCount, symbolFilePath);
-        System.out.println(msg);
+        System.err.println(msg);
         return offset;
     }
 

@@ -53,7 +53,7 @@ import java.nio.file.StandardCopyOption;
                         StandardCopyOption.REPLACE_EXISTING);
                     System.load(file.getAbsoluteFile().toString());
                 }
-                System.out.println("Successfully loaded native library!");
+                System.err.println("Successfully loaded native library!");
             } catch (UnsatisfiedLinkError e) {
                 System.err.println("Failed to load a native library:" + e);
                 return false;

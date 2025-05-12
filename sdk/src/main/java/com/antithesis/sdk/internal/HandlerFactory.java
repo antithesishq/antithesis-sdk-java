@@ -79,11 +79,11 @@ public class HandlerFactory {
             try {
                 fullPath = this.outFile.getAbsolutePath();
             } catch (Throwable e) {
-                System.out.printf("Unable to getAbsolutePath() for '%s'\n", this.outFile.toString());
-                System.out.println(e);
+                System.err.printf("Unable to getAbsolutePath() for '%s'\n", this.outFile.toString());
+                System.err.println(e);
                 fullPath = fileName;
             }
-            System.out.printf("Assertion output will be sent to: \"%s\"\n", fullPath);
+            System.err.printf("Assertion output will be sent to: \"%s\"\n", fullPath);
         }
 
         public static Optional<OutputHandler> get() {
