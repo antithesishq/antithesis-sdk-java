@@ -81,7 +81,7 @@ repositories {
 }
 
 dependencies {
-    implementation 'com.fasterxml.jackson.core:jackson-databind:2.2.3'
+    api 'com.fasterxml.jackson.core:jackson-databind:2.19.0'
 
     if (file("libs/antithesis-ffi-${project.version}.jar").isFile()) {
         implementation(files("libs/antithesis-ffi-${project.version}.jar"))
@@ -95,7 +95,6 @@ dependencies {
     // Use JUnit Jupiter for testing.
     testImplementation 'org.junit.jupiter:junit-jupiter:5.9.3'
     testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
-    testImplementation 'com.fasterxml.jackson.core:jackson-databind:2.2.3'
 
     testCompileOnly 'org.projectlombok:lombok:1.18.34'
     testAnnotationProcessor 'org.projectlombok:lombok:1.18.34'
