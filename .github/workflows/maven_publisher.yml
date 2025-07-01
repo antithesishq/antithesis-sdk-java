@@ -18,8 +18,20 @@ jobs:
       - name: Setup Gradle
         uses: gradle/actions/setup-gradle@af1da67850ed9a4cedd57bfd976089dd991e2582 # v4.0.0
 
-      - name: Publish package
-        run: ./gradlew jreleaserFullRelease
+      - name: Publish FFI package
+        run: mkdir -p ./ffi/build/jreleaser && ./gradlew :ffi:jreleaserFullRelease
+        continue-on-error: true # Publishing to maven central is expected to time out at verification
+        env:
+          JRELEASER_GPG_PASSPHRASE: ${{ secrets.JRELEASER_GPG_PASSPHRASE }}
+          JRELEASER_GPG_PUBLIC_KEY: ${{ secrets.JRELEASER_GPG_PUBLIC_KEY }}
+          JRELEASER_GPG_SECRET_KEY: ${{ secrets.JRELEASER_GPG_SECRET_KEY }}
+          JRELEASER_GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          JRELEASER_MAVENCENTRAL_USERNAME: ${{ secrets.OSSRH_USERNAME }}
+          JRELEASER_MAVENCENTRAL_TOKEN: ${{ secrets.OSSRH_TOKEN }}
+
+      - name: Publish SDK package
+        run: mkdir -p ./sdk/build/jreleaser && ./gradlew :sdk:jreleaserFullRelease
+        continue-on-error: true # Publishing to maven central is expected to time out at verification
         env:
           JRELEASER_GPG_PASSPHRASE: ${{ secrets.JRELEASER_GPG_PASSPHRASE }}
           JRELEASER_GPG_PUBLIC_KEY: ${{ secrets.JRELEASER_GPG_PUBLIC_KEY }}
