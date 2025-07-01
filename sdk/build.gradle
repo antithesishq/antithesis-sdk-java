@@ -52,7 +52,6 @@ publishing {
         }
     }
 }
-publish.dependsOn(':ffi:publish')
 
 jreleaser {
     gitRootSearch = true
@@ -74,7 +73,6 @@ jreleaser {
     }
 }
 jreleaserFullRelease.dependsOn(publish)
-jreleaserFullRelease.dependsOn(':ffi:jreleaserFullRelease')
 
 repositories {
     mavenCentral()
@@ -122,12 +120,12 @@ jar {
     preserveFileTimestamps = false
 }
 
-task copyDependencies(type: Copy) {
-    doLast {}
-    from configurations.runtimeClasspath
-    into 'build/dependencies'
+tasks.register("copyDependencies", Copy) {
+    from(configurations.runtimeClasspath)
+    into(layout.buildDirectory.dir("dependencies"))
 }
-build.dependsOn copyDependencies
+
+assemble.dependsOn copyDependencies
 
 task generateJavadoc(type: Javadoc) {
     source = sourceSets.main.allJava

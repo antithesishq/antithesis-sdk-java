@@ -14,10 +14,10 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
  * <p>
  * Each static method in this class takes a parameter called <code>message</code>, which is
  * a string literal identifier used to aggregate assertions.
- * Antithesis generates one test property per unique <code>message</code>.  This test property will be named <code>message</code> in the <a href="https://antithesis.com/docs/reports/triage/" target="_blank">triage report</a>.
+ * Antithesis generates one test property per unique <code>message</code>.  This test property will be named <code>message</code> in the <a href="https://antithesis.com/docs/reports/" target="_blank">triage report</a>.
  * <p>
  * Each static method also takes a parameter called <code>details</code>, which is an <code>ObjectNode</code> reference of optional additional information provided by the user to add context for assertion failures.
- * The information that is logged will appear in the <code>logs</code> section of a <a href="https://antithesis.com/docs/reports/triage/" target="_blank">triage report</a>.
+ * The information that is logged will appear in the <code>logs</code> section of a <a href="https://antithesis.com/docs/reports/" target="_blank">triage report</a>.
  * Normally the values in <code>details</code> are evaluated at runtime.
  */
 final public class Assert {

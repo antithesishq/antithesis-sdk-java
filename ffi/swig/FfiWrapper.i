@@ -44,8 +44,20 @@ import java.nio.file.StandardCopyOption;
     private static boolean loadLibrary() {
         boolean nativeLibraryFound = hasNativeLibrary();
         if (nativeLibraryFound) {
+            // We follow the steps below to load the native library:
+            // 1. Identify if the system temp directory exists, if not create it.
+            // 2. Find the libFfiWrapper.so in the classpath. The libFfiWrapper.so should be
+            // packed with antithesis-ffi-VERSION.jar.
+            // 3. Copy the libFfiWrapper.so to the system temp directory.
+            // * We do not load the library through `System.loadLibrary` because Spring boot was apparently notably
+            // unhappy under certain setups with us trying to put it in known loadLibrary paths thus,
+            // we instead create a temp file and load it by absolute path.
             try {
-                File file = File.createTempFile("libFfiWrapper", ".so");
+                File tmpDir =  new File(System.getProperty("java.io.tmpdir", "/tmp"));
+                if (!tmpDir.exists()) {
+                    tmpDir.mkdirs();
+                }
+                File file = File.createTempFile("libFfiWrapper", ".so", tmpDir);
                 try (InputStream link = (Thread.currentThread().getContextClassLoader().getResourceAsStream("libFfiWrapper.so"))){
                     Files.copy(
                         link,
