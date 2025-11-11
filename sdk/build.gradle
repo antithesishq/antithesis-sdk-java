@@ -79,7 +79,13 @@ repositories {
 }
 
 dependencies {
-    implementation 'com.fasterxml.jackson.core:jackson-databind:2.2.3'
+    api('com.fasterxml.jackson.core:jackson-databind') {
+        version {
+            strictly("[2.14,3.0[") // 2.14 <= version < 3.0
+            // 2.14 is the most recent version with no reported vulnerabilities (revisit as necessary)
+            // 3.0 introduces breaking API changes
+        }
+    }
 
     if (file("libs/antithesis-ffi-${project.version}.jar").isFile()) {
         implementation(files("libs/antithesis-ffi-${project.version}.jar"))
