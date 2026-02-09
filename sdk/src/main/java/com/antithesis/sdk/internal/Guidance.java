@@ -86,7 +86,7 @@ public final class Guidance {
         }
 
         boolean shouldSend(double value) {
-            if (maximize ? (mark > value) : (mark < value)) return false;
+            if (maximize ? (mark >= value) : (mark <= value)) return false;
             // Report NaN values, but don't let them update the mark.
             if (!Double.isNaN(value)) {
                 this.mark = value;

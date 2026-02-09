@@ -23,6 +23,6 @@ The antithesis SDK for Java will expect the following
 at runtime. Minimum versions are shown and later versions 
 should work.
 
-    antithesis-ffi 1.4.5 (or above)
+    antithesis-ffi 1.4.6 (or above)
     jackson 2.14.0 (or above)
 
