@@ -9,8 +9,8 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
 /**
- * The Assert class enables defining <a href="https://antithesis.com/docs/using_antithesis/properties/" target="_blank">test properties</a>
- * about your program or <a href="https://antithesis.com/docs/getting_started/first_test/" target="_blank">workload</a>.
+ * The Assert class enables defining <a href="https://antithesis.com/docs/properties_assertions/properties/" target="_blank">test properties</a>
+ * about your program or <a href="https://antithesis.com/docs/test_templates/first_test/" target="_blank">workload</a>.
  * <p>
  * Each static method in this class takes a parameter called <code>message</code>, which is
  * a string literal identifier used to aggregate assertions.
