@@ -1,0 +1,45 @@
+# Changelog
+
+## 1.5.0 - 2026-03-23
+
+Bump ASM to 9.9.1 for scanning classes compiled with the latest Java versions.
+
+## 1.4.6 - 2026-02-09
+
+Reduce verbosity of guidance tracking. The SDK now only emits guidance events when a value strictly exceeds the previous tracked min/max, rather than on equal values too.
+
+## 1.4.5 - 2025-11-10
+
+Update `jackson-databind` dependency to require 2.18.5 or later (2.18 is the current LTS-supported release).
+
+## 1.4.4 - 2025-07-01
+
+Internal release workflow fixes. No user-visible changes.
+
+## 1.4.3 - 2025-05-12
+
+Emit error messages to stderr instead of stdout for both the SDK and FFI.
+
+## 1.4.2 - 2025-02-27
+
+Switch assertion cataloging to use abstract interpretation for more reliable results for `message`. This fixes cases where the previous bytecode-scanning approach missed or mis-cataloged assertions.
+
+## 1.4.1 - 2025-02-07
+
+Miscellanous bug fixes and cleanup.
+
+## 1.4.0 - 2024-11-07
+
+Adding guidance-based assertions. These are both assertions and guidance for the fuzzer to explore your program more effectively.
+
+Unsign JARs during Java instrumentation, fixing instrumentation of signed third-party libraries.
+
+Improve SDK robustness.
+
+## 1.3.1 - 2024-08-16
+
+Internal build system improvements (Gradle). No user-visible changes.
+
+## 1.3.0 - 2024-08-05
+
+Initial release.
