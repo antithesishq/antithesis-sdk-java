@@ -13,7 +13,7 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
  * about your program or <a href="https://antithesis.com/docs/test_templates/first_test/" target="_blank">workload</a>.
  * <p>
  * Each static method in this class takes a parameter called <code>message</code>, which is
- * a string literal identifier used to aggregate assertions.
+ * a string literal or any compile-time constant value identifier used to aggregate assertions.
  * Antithesis generates one test property per unique <code>message</code>.  This test property will be named <code>message</code> in the <a href="https://antithesis.com/docs/reports/" target="_blank">triage report</a>.
  * <p>
  * Each static method also takes a parameter called <code>details</code>, which is an <code>ObjectNode</code> reference of optional additional information provided by the user to add context for assertion failures.
@@ -36,7 +36,7 @@ final public class Assert {
      * @param message   a unique string identifier of the assertion. 
      *                  Provides context for assertion success/failure 
      *                  and is intended to be human-readable.  Must be 
-     *                  provided as a string literal.
+     *                  provided as a string literal or any compile-time constant value.
      * @param details   additional details that provide greater context 
      *                  for assertion success/failure.  Evaluated at runtime.
      */
@@ -69,7 +69,7 @@ final public class Assert {
      * @param message   a unique string identifier of the assertion. 
      *                  Provides context for assertion success/failure 
      *                  and is intended to be human-readable.  Must be 
-     *                  provided as a string literal.
+     *                  provided as a string literal or any compile-time constant value.
      * @param details   additional details that provide greater context 
      *                  for assertion success/failure.  Evaluated at runtime.
      */
@@ -97,7 +97,7 @@ final public class Assert {
      * @param message   a unique string identifier of the assertion. 
      *                  Provides context for assertion success/failure 
      *                  and is intended to be human-readable.  Must be 
-     *                  provided as a string literal.
+     *                  provided as a string literal or any compile-time constant value.
      * @param details   additional details that provide greater context 
      *                  for assertion success/failure.  Evaluated at runtime.
      */
@@ -129,7 +129,7 @@ final public class Assert {
      * @param message   a unique string identifier of the assertion. 
      *                  Provides context for assertion success/failure 
      *                  and is intended to be human-readable.  Must be 
-     *                  provided as a string literal.
+     *                  provided as a string literal or any compile-time constant value.
      * @param details   additional details that provide greater context 
      *                  for assertion success/failure.  Evaluated at runtime.
      */
@@ -157,7 +157,7 @@ final public class Assert {
      * @param message   a unique string identifier of the assertion. 
      *                  Provides context for assertion success/failure 
      *                  and is intended to be human-readable.  Must be 
-     *                  provided as a string literal.
+     *                  provided as a string literal or any compile-time constant value.
      * @param details   additional details that provide greater context 
      *                  for assertion success/failure.  Evaluated at runtime.
      */
@@ -204,7 +204,8 @@ final public class Assert {
      * @param condition    the condition being asserted.  Evaluated at runtime.
      * @param message   a unique string identifier of the assertion. 
      *                  Provides context for assertion success/failure 
-     *                  and is intended to be human-readable.
+     *                  and is intended to be human-readable. Must be 
+     *                  provided as a string literal or any compile-time constant value.
      * @param details   additional details that provide greater context 
      *                  for assertion success/failure.  Evaluated at runtime.
      * @param hit          true if the assertion has been evaluated, false if the assertion is being added to the assertion catalog
@@ -338,7 +339,7 @@ final public class Assert {
      * @param message  a unique string identifier of the assertion.
      *                 Provides context for assertion success/failure
      *                 and is intended to be human-readable.  Must be
-     *                 provided as a string literal.
+     *                 provided as a string literal or any compile-time constant value.
      * @param details  additional details that provide greater context
      *                 for assertion success/failure.  Evaluated at runtime.
      * @see Assert#always always
@@ -363,7 +364,7 @@ final public class Assert {
      * @param message  a unique string identifier of the assertion.
      *                 Provides context for assertion success/failure
      *                 and is intended to be human-readable.  Must be
-     *                 provided as a string literal.
+     *                 provided as a string literal or any compile-time constant value.
      * @param details  additional details that provide greater context
      *                 for assertion success/failure.  Evaluated at runtime.
      * @see Assert#always always
@@ -388,7 +389,7 @@ final public class Assert {
      * @param message  a unique string identifier of the assertion.
      *                 Provides context for assertion success/failure
      *                 and is intended to be human-readable.  Must be
-     *                 provided as a string literal.
+     *                 provided as a string literal or any compile-time constant value.
      * @param details  additional details that provide greater context
      *                 for assertion success/failure.  Evaluated at runtime.
      * @see Assert#always always
@@ -413,7 +414,7 @@ final public class Assert {
      * @param message  a unique string identifier of the assertion.
      *                 Provides context for assertion success/failure
      *                 and is intended to be human-readable.  Must be
-     *                 provided as a string literal.
+     *                 provided as a string literal or any compile-time constant value.
      * @param details  additional details that provide greater context
      *                 for assertion success/failure.  Evaluated at runtime.
      * @see Assert#always always
@@ -438,7 +439,7 @@ final public class Assert {
      * @param message  a unique string identifier of the assertion.
      *                 Provides context for assertion success/failure
      *                 and is intended to be human-readable.  Must be
-     *                 provided as a string literal.
+     *                 provided as a string literal or any compile-time constant value.
      * @param details  additional details that provide greater context
      *                 for assertion success/failure.  Evaluated at runtime.
      * @see Assert#sometimes sometimes
@@ -463,7 +464,7 @@ final public class Assert {
      * @param message  a unique string identifier of the assertion.
      *                 Provides context for assertion success/failure
      *                 and is intended to be human-readable.  Must be
-     *                 provided as a string literal.
+     *                 provided as a string literal or any compile-time constant value.
      * @param details  additional details that provide greater context
      *                 for assertion success/failure.  Evaluated at runtime.
      * @see Assert#sometimes sometimes
@@ -488,7 +489,7 @@ final public class Assert {
      * @param message  a unique string identifier of the assertion.
      *                 Provides context for assertion success/failure
      *                 and is intended to be human-readable.  Must be
-     *                 provided as a string literal.
+     *                 provided as a string literal or any compile-time constant value.
      * @param details  additional details that provide greater context
      *                 for assertion success/failure.  Evaluated at runtime.
      * @see Assert#sometimes sometimes
@@ -513,7 +514,7 @@ final public class Assert {
      * @param message  a unique string identifier of the assertion.
      *                 Provides context for assertion success/failure
      *                 and is intended to be human-readable.  Must be
-     *                 provided as a string literal.
+     *                 provided as a string literal or any compile-time constant value.
      * @param details  additional details that provide greater context
      *                 for assertion success/failure.  Evaluated at runtime.
      * @see Assert#sometimes sometimes
@@ -541,7 +542,7 @@ final public class Assert {
      * @param message     a unique string identifier of the assertion.
      *                    Provides context for assertion success/failure
      *                    and is intended to be human-readable.  Must be
-     *                    provided as a string literal.
+     *                    provided as a string literal or any compile-time constant value.
      * @param details     additional details that provide greater context
      *                    for assertion success/failure.  Evaluated at runtime.
      * @see Assert#always always
@@ -568,7 +569,7 @@ final public class Assert {
      * @param message     a unique string identifier of the assertion.
      *                    Provides context for assertion success/failure
      *                    and is intended to be human-readable.  Must be
-     *                    provided as a string literal.
+     *                    provided as a string literal or any compile-time constant value.
      * @param details     additional details that provide greater context
      *                    for assertion success/failure.  Evaluated at runtime.
      * @see Assert#sometimes sometimes

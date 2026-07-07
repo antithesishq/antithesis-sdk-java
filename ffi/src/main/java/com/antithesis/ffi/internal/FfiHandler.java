@@ -7,6 +7,13 @@ public class FfiHandler implements OutputHandler {
 
     private static long offset = -1;
 
+    // notify_coverage() returns false when libvoidstar will never need to hear
+    // about an edge again; recording that here lets us skip the JNI crossing
+    // (and the process-global native lock behind it) for every later hit, like
+    // the Go/JS/C# SDKs do. Unsynchronized on purpose: the race is benign, a
+    // stale read only costs one redundant native call.
+    private static boolean[] edgeVisited;
+
     public static Optional<OutputHandler> get() {
         if (FfiWrapperJNI.LOAD_LIBRARY_MARKER) {
             return Optional.of(new FfiHandler());
@@ -23,13 +30,27 @@ public class FfiHandler implements OutputHandler {
             throw new IllegalArgumentException("Antithesis Java instrumentation supports [1 ," + Integer.MAX_VALUE + "] edges");
         }
         offset = FfiWrapperJNI.init_coverage_module(edgeCount, symbolFilePath);
+        // Edge ids from the instrumentor are 1-based, so the table needs edgeCount + 1 slots.
+        edgeVisited = new boolean[(int) Math.min(edgeCount + 1, Integer.MAX_VALUE)];
         String msg = String.format("Initialized Java module at offset 0x%016x with %d edges; symbol file %s", offset, edgeCount, symbolFilePath);
         System.err.println(msg);
         return offset;
     }
 
     public static void notifyModuleEdge(long edgePlusModule) {
-        FfiWrapperJNI.notify_coverage(edgePlusModule);
+        final boolean[] visited = edgeVisited;
+        final long edge = edgePlusModule - offset;
+        if (visited == null || edge < 0 || edge >= visited.length) {
+            FfiWrapperJNI.notify_coverage(edgePlusModule);
+            return;
+        }
+        final int index = (int) edge;
+        if (visited[index]) {
+            return;
+        }
+        if (!FfiWrapperJNI.notify_coverage(edgePlusModule)) {
+            visited[index] = true;
+        }
     }
 
     @Override

@@ -12,6 +12,7 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 import java.io.IOException;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.atomic.AtomicInteger;
 
 @lombok.Builder
 @lombok.AllArgsConstructor
@@ -67,35 +68,23 @@ public final class Assertion {
     }
 
     public void trackEntry() {
-        // Requirement: Catalog entries must always will emit()
+        TrackingInfo trackingInfo = TRACKER.computeIfAbsent(this.id, (key) -> {
+            return new TrackingInfo(this.location);
+        });
+
         if (!this.hit) {
-            if (!TRACKER.containsKey(this.id)) {
-                TRACKER.put(this.id, new TrackingInfo(this.location));
-            }
+            // Requirement: Catalog entries must always will emit()
             this.emit();
             return;
         }
 
-        TrackingInfo trackingInfo = TRACKER.compute(this.id, (key, value) -> {
-            if (value == null) {
-                // Establish TrackingInfo for this trackingKey when needed
-                value = new TrackingInfo(this.location);
-            }
-            // Record the condition in the associated TrackingInfo entry,
-            if (this.condition) {
-                value.trackPass();
-            } else {
-                value.trackFail();
-            }
-            return value;
-        });
-
+        // Record the condition in the associated TrackingInfo entry,
         if (this.condition) {
-            if (trackingInfo.passCount == 1) {
+            if (trackingInfo.trackPass() == 1) {
                 emit();
             }
         } else {
-            if (trackingInfo.failCount == 1) {
+            if (trackingInfo.trackFail() == 1) {
                 emit();
             }
         }
@@ -104,37 +93,31 @@ public final class Assertion {
 
     private void emit() {
         ObjectNode assertionNode = MAPPER.createObjectNode();
-        assertionNode.put("antithesis_assert", MAPPER.valueToTree(this));
+        assertionNode.set("antithesis_assert", MAPPER.valueToTree(this));
 
         Internal.dispatchOutput(assertionNode);
     }
 
     private static class TrackingInfo {
-        int passCount = 0;
-        int failCount = 0;
-        LocationInfo locInfo;
+        private final AtomicInteger passCount = new AtomicInteger();
+        private final AtomicInteger failCount = new AtomicInteger();
+        private final LocationInfo locInfo;
 
         public TrackingInfo(final LocationInfo locInfo) {
             this.locInfo = locInfo;
         }
 
-        protected void trackPass() {
-            this.passCount++;
+        protected int trackPass() {
+            return this.passCount.incrementAndGet();
         }
 
-        protected void trackFail() {
-            this.failCount++;
+        protected int trackFail() {
+            return this.failCount.incrementAndGet();
         }
 
         protected LocationInfo getLocationInfo() {
             return this.locInfo;
         }
-
-        protected void setLocationInfo(final LocationInfo locInfo) {
-            this.locInfo = locInfo;
-        }
     }
 
 }
-
-

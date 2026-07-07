@@ -1,5 +1,10 @@
 # Changelog
 
+## 1.5.1 - 2026-07-07
+
+- Skip redundant coverage callbacks. Once the platform indicates an edge no longer needs to be reported, the SDK avoids the native call for every later hit of that edge, matching the behavior of the other SDKs.
+- Fix minor concurrency issue in edge reporting
+
 ## 1.5.0 - 2026-03-23
 
 Bump ASM to 9.9.1 for scanning classes compiled with the latest Java versions.
