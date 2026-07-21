@@ -9,7 +9,6 @@ import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 
 /**
@@ -77,12 +76,25 @@ public class AssertEdgeCaseTest {
     }
 
     /**
-     * Documents the current (inconsistent) behaviour: the numeric helpers
-     * dereference details and therefore throw on null, unlike the plain methods.
+     * The numeric helpers tolerate a null details argument (like the plain
+     * methods) and still emit the merged left/right guidance data.
      */
     @Test
-    void numericHelperThrowsOnNullDetails_currentBehaviour() {
-        assertThrows(NullPointerException.class,
-                () -> Assert.alwaysGreaterThan(1.0, 2.0, "edge-null-numeric", null));
+    void numericHelperToleratesNullDetails() {
+        assertDoesNotThrow(() -> Assert.alwaysGreaterThan(1.0, 2.0, "edge-null-numeric", null));
+        JsonNode emittedDetails = capture.assertionsFor("edge-null-numeric").get(0).get("details");
+        assertEquals(1.0, emittedDetails.get("left").asDouble(), 0.0);
+        assertEquals(2.0, emittedDetails.get("right").asDouble(), 0.0);
+    }
+
+    /** The boolean-map helpers also tolerate a null details argument. */
+    @Test
+    void booleanHelpersTolerateNullDetails() {
+        java.util.Map<String, Boolean> conditions = new java.util.LinkedHashMap<>();
+        conditions.put("a", true);
+        assertDoesNotThrow(() -> Assert.alwaysSome(conditions, "edge-null-some", null));
+        assertDoesNotThrow(() -> Assert.sometimesAll(conditions, "edge-null-all", null));
+        assertEquals(1, capture.assertionsFor("edge-null-some").size());
+        assertEquals(1, capture.assertionsFor("edge-null-all").size());
     }
 }
