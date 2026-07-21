@@ -450,7 +450,7 @@ final public class Assert {
         ObjectNode guidanceData = new ObjectMapper().createObjectNode().put("left", leftValue).put("right", rightValue);
         ObjectNode detailsExtended = (ObjectNode) details.setAll(guidanceData);
         sometimesHelper(leftValue > rightValue, message, detailsExtended);
-        guidanceHelper(GuidanceType.Numeric, guidanceData, false, message);
+        guidanceHelper(GuidanceType.Numeric, guidanceData, true, message);
     }
 
     /**
@@ -475,7 +475,7 @@ final public class Assert {
         ObjectNode guidanceData = new ObjectMapper().createObjectNode().put("left", leftValue).put("right", rightValue);
         ObjectNode detailsExtended = (ObjectNode) details.setAll(guidanceData);
         sometimesHelper(leftValue >= rightValue, message, detailsExtended);
-        guidanceHelper(GuidanceType.Numeric, guidanceData, false, message);
+        guidanceHelper(GuidanceType.Numeric, guidanceData, true, message);
     }
 
     /**
@@ -500,7 +500,7 @@ final public class Assert {
         ObjectNode guidanceData = new ObjectMapper().createObjectNode().put("left", leftValue).put("right", rightValue);
         ObjectNode detailsExtended = (ObjectNode) details.setAll(guidanceData);
         sometimesHelper(leftValue < rightValue, message, detailsExtended);
-        guidanceHelper(GuidanceType.Numeric, guidanceData, true, message);
+        guidanceHelper(GuidanceType.Numeric, guidanceData, false, message);
     }
 
     /**
@@ -525,7 +525,7 @@ final public class Assert {
         ObjectNode guidanceData = new ObjectMapper().createObjectNode().put("left", leftValue).put("right", rightValue);
         ObjectNode detailsExtended = (ObjectNode) details.setAll(guidanceData);
         sometimesHelper(leftValue <= rightValue, message, detailsExtended);
-        guidanceHelper(GuidanceType.Numeric, guidanceData, true, message);
+        guidanceHelper(GuidanceType.Numeric, guidanceData, false, message);
     }
 
     /**
