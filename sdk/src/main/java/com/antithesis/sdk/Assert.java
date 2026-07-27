@@ -36,7 +36,13 @@ final public class Assert {
      * argument is treated as an empty object.
      */
     private static ObjectNode mergeGuidance(final ObjectNode details, final ObjectNode guidanceData) {
-        ObjectNode merged = (details == null) ? MAPPER.createObjectNode() : details.deepCopy();
+        if (details == null) {
+            return guidanceData;
+        }
+        // Create a shallow copy of the details
+        ObjectNode merged = MAPPER.createObjectNode();
+        merged.setAll(details);
+        // Add guidance fields on top
         merged.setAll(guidanceData);
         return merged;
     }
