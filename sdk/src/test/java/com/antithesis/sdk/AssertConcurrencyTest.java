@@ -32,6 +32,8 @@ public class AssertConcurrencyTest {
         CaptureSupport.uninstall();
     }
 
+    //TODO: port to Hegel and expand this simple test once Hegel is in use for SDK tests
+    //Ref: https://github.corp.antithesis.com/antithesis/star/pull/2379#discussion_r5355
     @Test
     void concurrentPassesEmitExactlyOnce() throws InterruptedException {
         final int threads = 16;
