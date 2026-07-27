@@ -67,6 +67,11 @@ public final class Assertion {
         return maybeTrackingInfo.getLocationInfo();
     }
 
+    // Visible for testing: clears per-assertion tracking so tests start fresh.
+    static void resetTracking() {
+        TRACKER.clear();
+    }
+
     public void trackEntry() {
         TrackingInfo trackingInfo = TRACKER.computeIfAbsent(this.id, (key) -> {
             return new TrackingInfo(this.location);

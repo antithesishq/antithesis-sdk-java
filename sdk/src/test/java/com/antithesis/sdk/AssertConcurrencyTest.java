@@ -1,7 +1,10 @@
 package com.antithesis.sdk;
 
+import com.antithesis.sdk.internal.CaptureSupport;
+
 import com.fasterxml.jackson.databind.ObjectMapper;
 
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -22,6 +25,11 @@ public class AssertConcurrencyTest {
     @BeforeEach
     void setUp() {
         capture = CaptureSupport.install();
+    }
+
+    @AfterEach
+    void cleanUp() {
+        CaptureSupport.uninstall();
     }
 
     @Test

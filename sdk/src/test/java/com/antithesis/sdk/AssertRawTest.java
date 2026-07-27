@@ -1,11 +1,14 @@
 package com.antithesis.sdk;
 
+import com.antithesis.sdk.internal.CaptureSupport;
+
 import com.antithesis.sdk.Assert.AssertType;
 import com.antithesis.sdk.Assert.GuidanceType;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -24,6 +27,11 @@ public class AssertRawTest {
     @BeforeEach
     void setUp() {
         capture = CaptureSupport.install();
+    }
+
+    @AfterEach
+    void cleanUp() {
+        CaptureSupport.uninstall();
     }
 
     private ObjectNode details() {

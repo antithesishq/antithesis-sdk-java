@@ -40,6 +40,12 @@ public class HandlerFactory {
         return HANDLER_INSTANCE;
     }
 
+    // Visible for testing: install a specific output handler (e.g. an in-memory
+    // capture) so tests can observe what the SDK emits.
+    static void useHandler(final OutputHandler handler) {
+        HANDLER_INSTANCE = handler;
+    }
+
     private static synchronized OutputHandler getInternal() {
         if (HANDLER_INSTANCE == null) {
             HANDLER_INSTANCE =
