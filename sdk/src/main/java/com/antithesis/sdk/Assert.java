@@ -22,10 +22,29 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
  */
 final public class Assert {
 
+    private static final ObjectMapper MAPPER = new ObjectMapper();
+
     /**
      * Default constructor
      */
     public Assert() {
+    }
+
+    /**
+     * Returns a new details node with {@code guidanceData} merged in, without
+     * mutating the caller-supplied {@code details}.  A {@code null} details
+     * argument is treated as an empty object.
+     */
+    private static ObjectNode mergeGuidance(final ObjectNode details, final ObjectNode guidanceData) {
+        if (details == null) {
+            return guidanceData;
+        }
+        // Create a shallow copy of the details
+        ObjectNode merged = MAPPER.createObjectNode();
+        merged.setAll(details);
+        // Add guidance fields on top
+        merged.setAll(guidanceData);
+        return merged;
     }
 
     /**
@@ -347,8 +366,8 @@ final public class Assert {
     public static <T extends Number> void alwaysGreaterThan(final T left, final T right, final String message, final ObjectNode details) {
         double leftValue = left.doubleValue();
         double rightValue = right.doubleValue();
-        ObjectNode guidanceData = new ObjectMapper().createObjectNode().put("left", leftValue).put("right", rightValue);
-        ObjectNode detailsExtended = (ObjectNode) details.setAll(guidanceData);
+        ObjectNode guidanceData = MAPPER.createObjectNode().put("left", leftValue).put("right", rightValue);
+        ObjectNode detailsExtended = mergeGuidance(details, guidanceData);
         alwaysHelper(leftValue > rightValue, message, detailsExtended);
         guidanceHelper(GuidanceType.Numeric, guidanceData, false, message);
     }
@@ -372,8 +391,8 @@ final public class Assert {
     public static <T extends Number> void alwaysGreaterThanOrEqualTo(final T left, final T right, final String message, final ObjectNode details) {
         double leftValue = left.doubleValue();
         double rightValue = right.doubleValue();
-        ObjectNode guidanceData = new ObjectMapper().createObjectNode().put("left", leftValue).put("right", rightValue);
-        ObjectNode detailsExtended = (ObjectNode) details.setAll(guidanceData);
+        ObjectNode guidanceData = MAPPER.createObjectNode().put("left", leftValue).put("right", rightValue);
+        ObjectNode detailsExtended = mergeGuidance(details, guidanceData);
         alwaysHelper(leftValue >= rightValue, message, detailsExtended);
         guidanceHelper(GuidanceType.Numeric, guidanceData, false, message);
     }
@@ -397,8 +416,8 @@ final public class Assert {
     public static <T extends Number> void alwaysLessThan(final T left, final T right, final String message, final ObjectNode details) {
         double leftValue = left.doubleValue();
         double rightValue = right.doubleValue();
-        ObjectNode guidanceData = new ObjectMapper().createObjectNode().put("left", leftValue).put("right", rightValue);
-        ObjectNode detailsExtended = (ObjectNode) details.setAll(guidanceData);
+        ObjectNode guidanceData = MAPPER.createObjectNode().put("left", leftValue).put("right", rightValue);
+        ObjectNode detailsExtended = mergeGuidance(details, guidanceData);
         alwaysHelper(leftValue < rightValue, message, detailsExtended);
         guidanceHelper(GuidanceType.Numeric, guidanceData, true, message);
     }
@@ -422,8 +441,8 @@ final public class Assert {
     public static <T extends Number> void alwaysLessThanOrEqualTo(final T left, final T right, final String message, final ObjectNode details) {
         double leftValue = left.doubleValue();
         double rightValue = right.doubleValue();
-        ObjectNode guidanceData = new ObjectMapper().createObjectNode().put("left", leftValue).put("right", rightValue);
-        ObjectNode detailsExtended = (ObjectNode) details.setAll(guidanceData);
+        ObjectNode guidanceData = MAPPER.createObjectNode().put("left", leftValue).put("right", rightValue);
+        ObjectNode detailsExtended = mergeGuidance(details, guidanceData);
         alwaysHelper(leftValue <= rightValue, message, detailsExtended);
         guidanceHelper(GuidanceType.Numeric, guidanceData, true, message);
     }
@@ -447,10 +466,10 @@ final public class Assert {
     public static <T extends Number> void sometimesGreaterThan(final T left, final T right, final String message, final ObjectNode details) {
         double leftValue = left.doubleValue();
         double rightValue = right.doubleValue();
-        ObjectNode guidanceData = new ObjectMapper().createObjectNode().put("left", leftValue).put("right", rightValue);
-        ObjectNode detailsExtended = (ObjectNode) details.setAll(guidanceData);
+        ObjectNode guidanceData = MAPPER.createObjectNode().put("left", leftValue).put("right", rightValue);
+        ObjectNode detailsExtended = mergeGuidance(details, guidanceData);
         sometimesHelper(leftValue > rightValue, message, detailsExtended);
-        guidanceHelper(GuidanceType.Numeric, guidanceData, false, message);
+        guidanceHelper(GuidanceType.Numeric, guidanceData, true, message);
     }
 
     /**
@@ -472,10 +491,10 @@ final public class Assert {
     public static <T extends Number> void sometimesGreaterThanOrEqualTo(final T left, final T right, final String message, final ObjectNode details) {
         double leftValue = left.doubleValue();
         double rightValue = right.doubleValue();
-        ObjectNode guidanceData = new ObjectMapper().createObjectNode().put("left", leftValue).put("right", rightValue);
-        ObjectNode detailsExtended = (ObjectNode) details.setAll(guidanceData);
+        ObjectNode guidanceData = MAPPER.createObjectNode().put("left", leftValue).put("right", rightValue);
+        ObjectNode detailsExtended = mergeGuidance(details, guidanceData);
         sometimesHelper(leftValue >= rightValue, message, detailsExtended);
-        guidanceHelper(GuidanceType.Numeric, guidanceData, false, message);
+        guidanceHelper(GuidanceType.Numeric, guidanceData, true, message);
     }
 
     /**
@@ -497,10 +516,10 @@ final public class Assert {
     public static <T extends Number> void sometimesLessThan(final T left, final T right, final String message, final ObjectNode details) {
         double leftValue = left.doubleValue();
         double rightValue = right.doubleValue();
-        ObjectNode guidanceData = new ObjectMapper().createObjectNode().put("left", leftValue).put("right", rightValue);
-        ObjectNode detailsExtended = (ObjectNode) details.setAll(guidanceData);
+        ObjectNode guidanceData = MAPPER.createObjectNode().put("left", leftValue).put("right", rightValue);
+        ObjectNode detailsExtended = mergeGuidance(details, guidanceData);
         sometimesHelper(leftValue < rightValue, message, detailsExtended);
-        guidanceHelper(GuidanceType.Numeric, guidanceData, true, message);
+        guidanceHelper(GuidanceType.Numeric, guidanceData, false, message);
     }
 
     /**
@@ -522,10 +541,10 @@ final public class Assert {
     public static <T extends Number> void sometimesLessThanOrEqualTo(final T left, final T right, final String message, final ObjectNode details) {
         double leftValue = left.doubleValue();
         double rightValue = right.doubleValue();
-        ObjectNode guidanceData = new ObjectMapper().createObjectNode().put("left", leftValue).put("right", rightValue);
-        ObjectNode detailsExtended = (ObjectNode) details.setAll(guidanceData);
+        ObjectNode guidanceData = MAPPER.createObjectNode().put("left", leftValue).put("right", rightValue);
+        ObjectNode detailsExtended = mergeGuidance(details, guidanceData);
         sometimesHelper(leftValue <= rightValue, message, detailsExtended);
-        guidanceHelper(GuidanceType.Numeric, guidanceData, true, message);
+        guidanceHelper(GuidanceType.Numeric, guidanceData, false, message);
     }
 
     /**
@@ -548,9 +567,9 @@ final public class Assert {
      * @see Assert#always always
     */
     public static void alwaysSome(final Map<String, Boolean> conditions, final String message, final ObjectNode details) {
-        ObjectNode guidanceData = new ObjectMapper().createObjectNode();
+        ObjectNode guidanceData = MAPPER.createObjectNode();
         conditions.forEach(guidanceData::put);
-        ObjectNode detailsExtended = (ObjectNode) details.setAll(guidanceData);
+        ObjectNode detailsExtended = mergeGuidance(details, guidanceData);
         alwaysHelper(conditions.containsValue(true), message, detailsExtended);
         guidanceHelper(GuidanceType.Boolean, guidanceData, false, message);
     }
@@ -575,9 +594,9 @@ final public class Assert {
      * @see Assert#sometimes sometimes
     */
     public static void sometimesAll(final Map<String, Boolean> conditions, final String message, final ObjectNode details) {
-        ObjectNode guidanceData = new ObjectMapper().createObjectNode();
+        ObjectNode guidanceData = MAPPER.createObjectNode();
         conditions.forEach(guidanceData::put);
-        ObjectNode detailsExtended = (ObjectNode) details.setAll(guidanceData);
+        ObjectNode detailsExtended = mergeGuidance(details, guidanceData);
         sometimesHelper(!conditions.containsValue(false), message, detailsExtended);
         guidanceHelper(GuidanceType.Boolean, guidanceData, true, message);
     }

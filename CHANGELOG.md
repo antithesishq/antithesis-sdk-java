@@ -1,5 +1,16 @@
 # Changelog
 
+## 1.6.0 - 2026-08-04
+
+- Remove small modulo bias from `random_choice`.
+- Add `com.antithesis.sdk.AntithesisRandom`, a subclass of `java.util.Random` that draws entropy from `com.antithesis.sdk.Random`.
+- Adopt libvoidstar coverage leases: hot edges are counted locally and cross JNI only when
+  the platform needs to hear about them, instead of on every hit.
+- Negotiate the instrumentation ABI version with libvoidstar at load. The native shim
+  binds all post-v1 symbols weakly and emulates lease behavior over the v1 interface, so
+  a newer jar runs correctly against any libvoidstar vintage. The negotiated ABI is logged
+  at initialization.
+
 ## 1.5.1 - 2026-07-07
 
 - Skip redundant coverage callbacks. Once the platform indicates an edge no longer needs to be reported, the SDK avoids the native call for every later hit of that edge, matching the behavior of the other SDKs.

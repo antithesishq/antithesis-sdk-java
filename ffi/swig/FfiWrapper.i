@@ -6,20 +6,111 @@
 #include <stddef.h>
 #include <stdint.h>
 #include <stdbool.h>
+#include <stdio.h>
+#include <unistd.h>
 
 #ifdef __cplusplus
 extern "C" {
 #endif
 
+/* Instrumentation ABI version 1 (see the linkage ABI versioning section of
+   instrumentation.h in the Antithesis platform): present in every libvoidstar ever
+   shipped, so these bind normally through the DT_NEEDED entry on
+   /usr/lib/libvoidstar.so that the Makefile adds with patchelf. */
 uint64_t fuzz_get_random();
 void fuzz_json_data( const char* message, size_t length );
 void fuzz_flush();
 size_t init_coverage_module(size_t edge_count, const char* symbol_file_name);
 bool notify_coverage(size_t edge_plus_module);
 
+/* Instrumentation ABI version 2 (coverage leases + version negotiation). Declared WEAK:
+   this jar ships independently of libvoidstar, so it must load — and the whole SDK must 
+   keep working — against older libraries that predate these symbols. The dynamic linker
+   resolves an undefined weak symbol to NULL instead of failing the load (even under 
+   LD_BIND_NOW=1). These must never be referenced from generated wrapper code: every use
+    below goes through a dispatcher gated on the negotiated ABI version. */
+uint64_t notify_coverage_v2(size_t edge_plus_module, uint64_t hit_since_last_call) __attribute__((weak));
+const uint64_t* coverage_lease_generation_addr(void) __attribute__((weak));
+uint64_t instrumentation_max_abi_version(void) __attribute__((weak));
+uint64_t instrumentation_request_abi_version(uint64_t requested) __attribute__((weak));
+
 #ifdef __cplusplus
 }
 #endif
+
+/* The ABI version this shim speaks. */
+#define FFI_REQUESTED_ABI 2
+
+/* Lease word layout; must match the ANTITHESIS_LEASE_* constants in instrumentation.h. */
+#define FFI_LEASE_GRANTED_SHIFT 20
+#define FFI_LEASE_MAX_GRANT 0xFFFFFul
+
+/* The ABI version negotiated with the loaded libvoidstar: the granted result of
+   requesting FFI_REQUESTED_ABI, or 1 if the library predates the negotiation mechanism.
+   Cached; the racy first-call initialization is benign because the library latches the
+   first grant for the life of the process — every call returns the same answer.*/
+static unsigned long negotiated_abi(void) {
+    static unsigned long cached = 0;
+    unsigned long v = cached;
+    if (v == 0) {
+        if (instrumentation_request_abi_version != NULL) {
+            v = (unsigned long)instrumentation_request_abi_version(FFI_REQUESTED_ABI);
+            if (v > FFI_REQUESTED_ABI) {
+                /* The library retired every version we speak, so there is no dialect we
+                   know how to use. Terminate deliberately with an explanation — this
+                   fires on the first instrumentation call, well before the application
+                   does real work — rather than guess at semantics we don't know. */
+                fprintf(stderr,
+                    "Antithesis: this SDK speaks instrumentation ABI %d, but the loaded libvoidstar no longer serves it (granted %lu). Please upgrade the Antithesis Java SDK. Terminating.\n",
+                    FFI_REQUESTED_ABI, v);
+                _exit(1);
+            }
+        } else {
+            v = 1;  /* Library predates ABI negotiation: version 1 by definition. */
+        }
+        cached = v;
+    }
+    return v;
+}
+
+/* What FfiWrapperJNI.notify_coverage_v2 actually calls (see %rename below). Against an
+   ABI-1 library it emulates leases on top of notify_coverage() the same way the stub
+   library models them: true -> grant 0 (call again on the next hit); false -> the v1
+   "never call again", expressed as an epoch-0 max-grant lease that Java counts down
+   locally. hit_since_last_call is deliberately dropped in emulation: an ABI-1 library
+   only ever accumulates hits it told us to stop reporting, and never received them from
+   v1 SDKs either. */
+static unsigned long ffi_notify_coverage_v2(size_t edge_plus_module, unsigned long hit_since_last_call) {
+    if (negotiated_abi() >= 2)
+        return (unsigned long)notify_coverage_v2(edge_plus_module, hit_since_last_call);
+    if (notify_coverage(edge_plus_module))
+        return 0;
+    return (FFI_LEASE_MAX_GRANT << FFI_LEASE_GRANTED_SHIFT) | FFI_LEASE_MAX_GRANT;
+}
+
+/* Revocation word handed out when the loaded libvoidstar predates leases: epoch 0
+   forever, exactly like the stub library's. */
+static const uint64_t emulated_lease_generation = 0;
+
+/* SWIG-friendly shim: hand the lease revocation word's address to Java as a plain
+   integer. Java reads it with sun.misc.Unsafe.getLongVolatile, because a direct
+   ByteBuffer has no volatile accessor and a plain load could be hoisted out of
+   JIT-compiled hot loops, hiding revocation. */
+static unsigned long lease_generation_address(void) {
+    if (negotiated_abi() >= 2)
+        return (unsigned long)(uintptr_t)coverage_lease_generation_addr();
+    return (unsigned long)(uintptr_t)&emulated_lease_generation;
+}
+
+/* Negotiated and maximum ABI versions.*/
+static unsigned long native_instrumentation_abi(void) {
+    return negotiated_abi();
+}
+static unsigned long native_max_instrumentation_abi(void) {
+    if (instrumentation_max_abi_version != NULL)
+        return (unsigned long)instrumentation_max_abi_version();
+    return 1;
+}
 %}
 
 %pragma(java) jniclassimports=%{
@@ -86,3 +177,8 @@ void fuzz_json_data( const char* message, size_t length );
 void fuzz_flush();
 size_t init_coverage_module(size_t edgeCount, const char* symbolFilePath);
 bool notify_coverage(size_t edgePlusModule);
+%rename(notify_coverage_v2) ffi_notify_coverage_v2;
+unsigned long ffi_notify_coverage_v2(size_t edgePlusModule, unsigned long hitSinceLastCall);
+unsigned long lease_generation_address();
+unsigned long native_instrumentation_abi();
+unsigned long native_max_instrumentation_abi();

@@ -51,6 +51,11 @@ public final class Guidance {
     @JsonProperty("hit")
     final private boolean hit;
 
+    // Visible for testing: clears per-guidance tracking so tests start fresh.
+    static void resetTracking() {
+        NUMERIC_TRACKERS.clear();
+    }
+
     public void trackEntry() {
         if (!this.hit) {
             this.emit();

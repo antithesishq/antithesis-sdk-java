@@ -73,9 +73,12 @@ final public class Random {
         } else if (list.size() == 1) {
             return list.get(0);
         } else {
-            // Safety: Result of modulo is always less than the divisor
-            // and will always fit into an integer
-            int idx = (int) Long.remainderUnsigned(getRandom(), list.size());
+            long ceiling = (Long.MAX_VALUE / (long)list.size()) * (long)list.size();
+            long candidate = getRandom();
+            while (candidate < 0 || candidate >= ceiling) {
+                candidate = getRandom();
+            }
+            int idx = (int) (candidate % list.size());
             return list.get(idx);
         }
     }
