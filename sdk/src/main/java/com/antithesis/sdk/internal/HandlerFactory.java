@@ -5,8 +5,9 @@ import com.antithesis.ffi.internal.OutputHandler;
 import com.antithesis.ffi.internal.FfiWrapperJNI;
 
 import java.io.File;
-import java.io.FileWriter;
+import java.io.FileOutputStream;
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 import java.util.Optional;
 import java.util.Random;
 
@@ -48,12 +49,17 @@ public class HandlerFactory {
 
     private static synchronized OutputHandler getInternal() {
         if (HANDLER_INSTANCE == null) {
-            HANDLER_INSTANCE =
+            OutputHandler handler =
                 FfiHandler.get().orElseGet(() ->
                         LocalHandler.get().orElseGet(() ->
                                 NoOpHandler.get().orElseThrow(RuntimeException::new))
                 );
-            Internal.dispatchVersionInfo();
+            // Emit the version header through the handler directly and only
+            // then publish it: publishing first would let another thread's
+            // event overtake the header through the unsynchronized fast path
+            // in get().
+            Internal.dispatchVersionInfo(handler);
+            HANDLER_INSTANCE = handler;
         }
         return HANDLER_INSTANCE;
     }
@@ -102,10 +108,10 @@ public class HandlerFactory {
 
         @Override
         public void output(final String value) {
-            try (FileWriter writer = new FileWriter(outFile, true)) {
-                writer.write(value);
-                writer.write("\n");
-                writer.flush();
+            // Using a byte[] and a FileOutputStream to ensure that each write is dispatched as a single syscall
+            final byte[] line = (value + "\n").getBytes(StandardCharsets.UTF_8);
+            try (FileOutputStream out = new FileOutputStream(outFile, true)) {
+                out.write(line);
             } catch (IOException ignored) {
             }
         }

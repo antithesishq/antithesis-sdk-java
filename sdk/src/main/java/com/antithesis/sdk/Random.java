@@ -23,7 +23,13 @@ final public class Random {
     }
 
     /**
-     * Returns a value chosen by Antithesis. 
+     * Returns a value chosen by Antithesis.
+     * <p>
+     * Because Java has no unsigned 64-bit type, the value is returned as a
+     * {@code long} and is negative about half the time (exactly like
+     * {@link java.util.Random#nextLong()}). To derive a bounded value, use
+     * {@link Long#remainderUnsigned(long, long)} or
+     * {@link Math#floorMod(long, long)}.
      * <p>
      * You should use this value immediately rather than using it
      * later. If you delay, then it is possible for the simulation to 
@@ -37,7 +43,7 @@ final public class Random {
      * branches, the PRNG will use the same sequence of values in 
      * all branches.
      * 
-     * @return Random long integer
+     * @return A (possibly negative) long integer
      */
     public static long getRandom() {
         return Internal.dispatchRandom();
@@ -73,12 +79,16 @@ final public class Random {
         } else if (list.size() == 1) {
             return list.get(0);
         } else {
-            long ceiling = (Long.MAX_VALUE / (long)list.size()) * (long)list.size();
+            // Unbiased rejection sampling over the full unsigned 64-bit
+            // range: accept draws below the largest representable multiple
+            // of size, so every index is equally likely.
+            long size = list.size();
+            long ceiling = Long.divideUnsigned(-1L, size) * size;
             long candidate = getRandom();
-            while (candidate < 0 || candidate >= ceiling) {
+            while (Long.compareUnsigned(candidate, ceiling) >= 0) {
                 candidate = getRandom();
             }
-            int idx = (int) (candidate % list.size());
+            int idx = (int) Long.remainderUnsigned(candidate, size);
             return list.get(idx);
         }
     }

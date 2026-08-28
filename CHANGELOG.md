@@ -1,5 +1,13 @@
 # Changelog
 
+## 1.7.0 - 2026-08-28
+
+- Fixed a data race in numeric guidance assertions.
+- When used in local debug mode, the output file (`ANTITHESIS_SDK_LOCAL_OUTPUT`) will no longer be truncated at initialization.
+- `Lifecycle.sendEvent` no longer trims the event name or substitutes `"anonymous"` for empty names; names pass through verbatim, matching the other SDKs.
+- Fixed an initialization race where an event emitted by a second thread could precede the `antithesis_sdk` version header in the output stream.
+- The instrumentor's symbol table now reports each edge's *source file* (the class's `SourceFile` attribute, qualified by its package directory) in the `file` column, instead of the name of the jar containing the class, so triage reports show real code locations. Classes compiled without a `SourceFile` attribute still fall back to the jar name.
+
 ## 1.6.0 - 2026-08-04
 
 - Remove small modulo bias from `random_choice`.

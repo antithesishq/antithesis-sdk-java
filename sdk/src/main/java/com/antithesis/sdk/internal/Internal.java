@@ -1,5 +1,6 @@
 package com.antithesis.sdk.internal;
 
+import com.antithesis.ffi.internal.OutputHandler;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
@@ -52,7 +53,11 @@ final public class Internal {
         return info;
     }
 
-    public static void dispatchVersionInfo() {
+    // Writes the version header through the given handler directly, NOT
+    // through HandlerFactory.get(): this runs while the handler is being
+    // initialized, before it is published, so the header is guaranteed to
+    // precede every event (and the call cannot recurse into the factory).
+    public static void dispatchVersionInfo(final OutputHandler handler) {
         ObjectNode antithesisLanguageInfo = MAPPER.createObjectNode();
         antithesisLanguageInfo.put("name", "Java");
         antithesisLanguageInfo.put("version", System.getProperty("java.version"));
@@ -64,7 +69,10 @@ final public class Internal {
 
         ObjectNode antithesisSDKInfo = MAPPER.createObjectNode();
         antithesisSDKInfo.put("antithesis_sdk", antithesisVersionInfo);
-        dispatchOutput(antithesisSDKInfo);
+        try {
+            handler.output(MAPPER.writeValueAsString(antithesisSDKInfo));
+        } catch (IOException ignored) {
+        }
     }
 
     public static long dispatchRandom() {

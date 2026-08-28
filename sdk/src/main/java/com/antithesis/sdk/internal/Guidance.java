@@ -3,6 +3,7 @@ package com.antithesis.sdk.internal;
 import java.io.IOException;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.atomic.AtomicLong;
 
 import com.antithesis.sdk.Assert.GuidanceType;
 import com.fasterxml.jackson.annotation.JsonProperty;
@@ -82,21 +83,30 @@ public final class Guidance {
     }
 
     private static class NumericTrackingInfo {
-        double mark = Double.NEGATIVE_INFINITY;
-        boolean maximize;
+        private final AtomicLong markBits;
+        private final boolean maximize;
 
         NumericTrackingInfo(boolean maximize) {
             this.maximize = maximize;
-            this.mark = maximize ? Double.NEGATIVE_INFINITY : Double.POSITIVE_INFINITY;
+            this.markBits = new AtomicLong(Double.doubleToRawLongBits(
+                    maximize ? Double.NEGATIVE_INFINITY : Double.POSITIVE_INFINITY));
         }
 
         boolean shouldSend(double value) {
-            if (maximize ? (mark >= value) : (mark <= value)) return false;
             // Report NaN values, but don't let them update the mark.
-            if (!Double.isNaN(value)) {
-                this.mark = value;
+            if (Double.isNaN(value)) {
+                return true;
             }
-            return true;
+            while (true) {
+                long currentBits = markBits.get();
+                double current = Double.longBitsToDouble(currentBits);
+                if (maximize ? (current >= value) : (current <= value)) {
+                    return false;
+                }
+                if (markBits.compareAndSet(currentBits, Double.doubleToRawLongBits(value))) {
+                    return true;
+                }
+            }
         }
     }
 }

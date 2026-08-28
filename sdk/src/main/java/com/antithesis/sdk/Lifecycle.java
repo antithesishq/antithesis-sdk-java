@@ -54,14 +54,11 @@ final public class Lifecycle {
      *                  for the lifecycle event.  Evaluated at runtime.
      */
     public static void sendEvent(final String name, final ObjectNode details) {
-        String thisName = name.trim();
-        if (thisName.isEmpty()) {
-            thisName = "anonymous";
-        }
-
+        // The name passes through verbatim — no trimming or substitution —
+        // so every SDK emits the same packet for the same call.
         ObjectMapper mapper = new ObjectMapper();
         ObjectNode eventJson = mapper.createObjectNode();
-        eventJson.put(thisName, details);
+        eventJson.put(name, details);
 
         Internal.dispatchOutput(eventJson);
     }
