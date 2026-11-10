@@ -72,10 +72,11 @@ final public class Random {
      * @param list An array of items to select from
      * @param <T>  Type of the array member items
      * @return Randomly selected item from the provided list.
+     * @throws IllegalArgumentException if the list is empty.
      */
     public static <T> T randomChoice(List<T> list) {
         if (list.isEmpty()) {
-            return null;
+            throw new IllegalArgumentException("cannot choose from an empty list");
         } else if (list.size() == 1) {
             return list.get(0);
         } else {

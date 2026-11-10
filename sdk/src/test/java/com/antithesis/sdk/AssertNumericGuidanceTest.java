@@ -12,6 +12,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -20,7 +21,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 /**
  * Covers numeric guidance emitted by the {@code always/sometimes *Than*} helpers:
  * the guidance_data payload, the {@code maximize} direction, the "strictly better
- * example" gating, and the NaN carve-out.
+ * example" gating, and non-finite operand suppression.
  * <p>
  * The expected {@code maximize} values are taken from the reference Antithesis
  * SDK convention: for a given comparison operator the "sometimes" variant uses
@@ -134,16 +135,34 @@ public class AssertNumericGuidanceTest {
     }
 
     /**
-     * A NaN (left-right) should be reported but must not corrupt the tracked
-     * mark: a subsequent non-improving finite value must still be suppressed.
+     * Non-finite operands must not emit guidance or change the tracked mark;
+     * the skipped guidance is reported once per process.
      */
     @Test
-    void nanIsReportedButDoesNotUpdateMark() {
+    void nonFiniteOperandsDoNotEmitOrUpdateMark() {
         String id = "num-nan";
         Assert.alwaysGreaterThan(10.0, 5.0, id, details());          // diff 5   -> emit (1), mark=5
-        Assert.alwaysGreaterThan(Double.NaN, 5.0, id, details());    // diff NaN -> emit (2), mark stays 5
+        assertTrue(skippedGuidanceWarnings().isEmpty(), "finite operands must not warn");
+        Assert.alwaysGreaterThan(Double.NaN, 5.0, id, details());
+        Assert.alwaysGreaterThan(Double.NEGATIVE_INFINITY, 5.0, id, details());
+        Assert.alwaysGreaterThan(5.0, Double.POSITIVE_INFINITY, id, details());
         Assert.alwaysGreaterThan(10.0, 5.0, id, details());          // diff 5   -> no (mark still 5)
+        Assert.alwaysGreaterThan(9.0, 5.0, id, details());          // diff 4 -> emit (2)
         assertEquals(2, capture.guidanceFor(id).size(),
-                "NaN should be reported once but must not move the mark to NaN");
+                "non-finite operands must neither emit nor prevent a later improvement");
+        List<JsonNode> warnings = skippedGuidanceWarnings();
+        assertEquals(1, warnings.size(), "skipped guidance is reported once per process");
+        assertEquals(id, warnings.get(0).get("context").asText());
+    }
+
+    private List<JsonNode> skippedGuidanceWarnings() {
+        List<JsonNode> out = new ArrayList<>();
+        for (JsonNode record : capture.records()) {
+            JsonNode warning = record.get("antithesis_warning");
+            if (warning != null && warning.get("code").asInt() == 6004) {
+                out.add(warning);
+            }
+        }
+        return out;
     }
 }

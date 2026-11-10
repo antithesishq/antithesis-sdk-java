@@ -10,6 +10,8 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
  */
 final public class Lifecycle {
 
+    private static final ObjectMapper MAPPER = new ObjectMapper();
+
     /**
      * Default constructor
      */
@@ -26,20 +28,23 @@ final public class Lifecycle {
      * Antithesis will treat the first time any process called this function as
      * the moment that the setup was completed.
      *
-     * @param details   additional details that provide greater context 
-     *                  for system setup.  Evaluated at runtime.
+     * A null details argument omits details; an explicit empty object is preserved.
+     * Serialization failures report an {@code antithesis_error} and still emit setup
+     * completion without details.
+     *
+     * @param details   additional details that provide greater context
+     *                  for system setup. Evaluated at runtime.
      */
     public static void setupComplete(final ObjectNode details) {
-        ObjectMapper mapper = new ObjectMapper();
 
-        ObjectNode antithesisSetup = mapper.createObjectNode();
+        ObjectNode antithesisSetup = MAPPER.createObjectNode();
         antithesisSetup.put("status", "complete");
-        antithesisSetup.put("details", details);
 
-        ObjectNode setup_complete_data = mapper.createObjectNode();
+        ObjectNode setup_complete_data = MAPPER.createObjectNode();
         setup_complete_data.put("antithesis_setup", antithesisSetup);
 
-        Internal.dispatchOutput(setup_complete_data);
+        Internal.dispatchWithDetails(setup_complete_data, antithesisSetup, "details",
+                details, "setup_complete", false);
     }
 
     /**
@@ -49,6 +54,10 @@ final public class Lifecycle {
      * In addition to <code>details</code>, you also provide <code>rawName</code>,
      * which is the name of the event that you are logging.
      *
+     * A null details argument produces an empty object payload. Serialization
+     * failures report an {@code antithesis_error} and still emit the event with
+     * an empty object payload.
+     *
      * @param name the name of the event that is being logged
      * @param details   additional details that provide greater context 
      *                  for the lifecycle event.  Evaluated at runtime.
@@ -56,11 +65,8 @@ final public class Lifecycle {
     public static void sendEvent(final String name, final ObjectNode details) {
         // The name passes through verbatim — no trimming or substitution —
         // so every SDK emits the same packet for the same call.
-        ObjectMapper mapper = new ObjectMapper();
-        ObjectNode eventJson = mapper.createObjectNode();
-        eventJson.put(name, details);
-
-        Internal.dispatchOutput(eventJson);
+        ObjectNode eventJson = MAPPER.createObjectNode();
+        Internal.dispatchWithDetails(eventJson, eventJson, name, details, name, true);
     }
 
 }

@@ -1,4 +1,4 @@
-{ pkgs, gradle2nix, strip_lock_hash }:
+{ pkgs, gradle2nix }:
 let
   ffi = let
     f_text = builtins.readFile ../gradle.properties;
@@ -12,7 +12,7 @@ let
   in (gradle2nix.buildGradlePackage {
       pname = "Antithesis Java FFI";
       version = ffi_version;
-      lockFile = strip_lock_hash ./gradle.lock;
+      lockFile = ./gradle.lock;
       gradleBuildFlags = [ "--quiet" "build" ];
       buildJdkVersion = pkgs.jdk21;
     }).overrideAttrs(_: prev: {

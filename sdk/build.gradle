@@ -81,9 +81,7 @@ repositories {
 dependencies {
     api('com.fasterxml.jackson.core:jackson-databind') {
         version {
-            strictly("[2.14,3.0[") // 2.14 <= version < 3.0
-            // 2.14 is the most recent version with no reported vulnerabilities (revisit as necessary)
-            // 3.0 introduces breaking API changes
+            strictly("[2.14,3.0[") // Jackson 3.0 introduces breaking API changes
         }
     }
 

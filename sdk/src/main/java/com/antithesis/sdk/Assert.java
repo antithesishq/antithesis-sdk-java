@@ -18,7 +18,9 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
  * <p>
  * Each static method also takes a parameter called <code>details</code>, which is an <code>ObjectNode</code> reference of optional additional information provided by the user to add context for assertion failures.
  * The information that is logged will appear in the <code>logs</code> section of a <a href="https://antithesis.com/docs/reports/" target="_blank">triage report</a>.
- * Normally the values in <code>details</code> are evaluated at runtime.
+ * A {@code null} details argument omits details; an explicit empty object is preserved.
+ * Serialization failures report an {@code antithesis_error} and still emit the
+ * assertion without details.
  */
 final public class Assert {
 
@@ -28,23 +30,6 @@ final public class Assert {
      * Default constructor
      */
     public Assert() {
-    }
-
-    /**
-     * Returns a new details node with {@code guidanceData} merged in, without
-     * mutating the caller-supplied {@code details}.  A {@code null} details
-     * argument is treated as an empty object.
-     */
-    private static ObjectNode mergeGuidance(final ObjectNode details, final ObjectNode guidanceData) {
-        if (details == null) {
-            return guidanceData;
-        }
-        // Create a shallow copy of the details
-        ObjectNode merged = MAPPER.createObjectNode();
-        merged.setAll(details);
-        // Add guidance fields on top
-        merged.setAll(guidanceData);
-        return merged;
     }
 
     /**
@@ -64,10 +49,19 @@ final public class Assert {
     }
 
     private static void alwaysHelper(final boolean condition, final String message, final ObjectNode details) {
+        alwaysHelper(condition, message, details, null);
+    }
+
+    private static void alwaysHelper(final boolean condition, final String message, final ObjectNode details,
+                                      final ObjectNode guidanceDetails) {
+        if (!Assertion.shouldEmit(message, condition)) {
+            return;
+        }
         Assertion.builder()
                 .assertType(AssertType.Always)
                 .condition(condition)
                 .details(details)
+                .guidanceDetails(guidanceDetails)
                 .displayType("Always")
                 .hit(true)
                 .id(message)
@@ -75,7 +69,7 @@ final public class Assert {
                 .message(message)
                 .mustHit(true)
                 .build()
-                .trackEntry();
+                .emit();
     }
 
     /**
@@ -93,6 +87,9 @@ final public class Assert {
      *                  for assertion success/failure.  Evaluated at runtime.
      */
     public static void alwaysOrUnreachable(final boolean condition, final String message, final ObjectNode details) {
+        if (!Assertion.shouldEmit(message, condition)) {
+            return;
+        }
         Assertion.builder()
                 .assertType(AssertType.Always)
                 .condition(condition)
@@ -104,7 +101,7 @@ final public class Assert {
                 .message(message)
                 .mustHit(false)
                 .build()
-                .trackEntry();
+                .emit();
     }
 
     /**
@@ -125,10 +122,19 @@ final public class Assert {
     }
 
     private static void sometimesHelper(final boolean condition, final String message, final ObjectNode details) {
+        sometimesHelper(condition, message, details, null);
+    }
+
+    private static void sometimesHelper(final boolean condition, final String message, final ObjectNode details,
+                                      final ObjectNode guidanceDetails) {
+        if (!Assertion.shouldEmit(message, condition)) {
+            return;
+        }
         Assertion.builder()
                 .assertType(AssertType.Sometimes)
                 .condition(condition)
                 .details(details)
+                .guidanceDetails(guidanceDetails)
                 .displayType("Sometimes")
                 .hit(true)
                 .id(message)
@@ -136,7 +142,7 @@ final public class Assert {
                 .message(message)
                 .mustHit(true)
                 .build()
-                .trackEntry();
+                .emit();
     }
 
     /**
@@ -153,6 +159,9 @@ final public class Assert {
      *                  for assertion success/failure.  Evaluated at runtime.
      */
     public static void unreachable(final String message, final ObjectNode details) {
+        if (!Assertion.shouldEmit(message, false)) {
+            return;
+        }
         Assertion.builder()
                 .assertType(AssertType.Reachability)
                 .condition(false)
@@ -164,7 +173,7 @@ final public class Assert {
                 .message(message)
                 .mustHit(false)
                 .build()
-                .trackEntry();
+                .emit();
     }
 
     /**
@@ -181,6 +190,9 @@ final public class Assert {
      *                  for assertion success/failure.  Evaluated at runtime.
      */
     public static void reachable(final String message, final ObjectNode details) {
+        if (!Assertion.shouldEmit(message, true)) {
+            return;
+        }
         Assertion.builder()
                 .assertType(AssertType.Reachability)
                 .condition(true)
@@ -192,7 +204,7 @@ final public class Assert {
                 .message(message)
                 .mustHit(true)
                 .build()
-                .trackEntry();
+                .emit();
     }
 
     /**
@@ -245,26 +257,49 @@ final public class Assert {
             final boolean hit,
             final boolean mustHit
     ) {
-        LocationInfo locationInfo = LocationInfo.builder()
-                .beginColumn(beginColumn)
-                .beginLine(beginLine)
-                .className(className)
-                .fileName(fileName)
-                .functionName(functionName)
-                .build();
+        Assertion.recordRaw(assertType, displayType, className, functionName, fileName,
+                beginLine, beginColumn, id, condition, message, details, hit, mustHit, null);
+    }
 
-        Assertion.builder()
-                .assertType(assertType)
-                .condition(condition)
-                .details(details)
-                .displayType(displayType)
-                .hit(hit)
-                .id(id)
-                .location(locationInfo)
-                .message(message)
-                .mustHit(mustHit)
-                .build()
-                .trackEntry();
+    /**
+     * This is a low-level method designed to be used by third-party frameworks.
+     * Regular users of the assertions class should not call it.
+     *
+     * @param assertType      must be a valid Assertion.AssertType value
+     * @param displayType     one of "Always", "AlwaysOrUnreachable", "Sometimes", "Reachable", "Unreachable"
+     * @param className       the name of the package and class containing this assertion
+     * @param functionName    the name of the method containing this assertion
+     * @param fileName        the name of the source file containing this assertion
+     * @param beginLine       the source line number where the assertion is located
+     * @param beginColumn     the source column number where the assertion is located
+     * @param id              the unique text associated with the assertion
+     * @param condition       the condition being asserted.  Evaluated at runtime.
+     * @param message         a unique string identifier of the assertion.
+     * @param details         additional details that provide greater context
+     *                        for assertion success/failure.  Evaluated at runtime.
+     * @param hit             true if the assertion has been evaluated, false if the assertion is being added to the assertion catalog
+     * @param mustHit         true if the assertion is expected to be evaluated at least once, otherwise false
+     * @param guidanceDetails the guidance values to merge over <code>details</code>, or null for a plain assertion
+     */
+    public static void rawAssert(
+            final AssertType assertType,
+            final String displayType,
+            final String className,
+            final String functionName,
+            final String fileName,
+            final int beginLine,
+            final int beginColumn,
+            final String id,
+            final boolean condition,
+            final String message,
+            final ObjectNode details,
+            final boolean hit,
+            final boolean mustHit,
+            final ObjectNode guidanceDetails
+    ) {
+        Assertion.recordRaw(assertType, displayType, className, functionName, fileName,
+                beginLine, beginColumn, id, condition, message, details, hit, mustHit,
+                guidanceDetails);
     }
 
     /**
@@ -310,6 +345,9 @@ final public class Assert {
         final String message,
         final boolean hit
     ) {
+        if (!Guidance.shouldEmit(guidanceType, guidanceData, maximize, id, hit)) {
+            return;
+        }
         LocationInfo location = LocationInfo.builder()
                 .beginColumn(beginColumn)
                 .beginLine(beginLine)
@@ -326,7 +364,54 @@ final public class Assert {
                 .data(guidanceData)
                 .hit(hit)
                 .build()
-                .trackEntry();
+                .emit();
+    }
+
+    /**
+     * @hidden
+     */
+    public static void rawNumericGuidance(
+        final Number left,
+        final Number right,
+        final boolean maximize,
+        final String className,
+        final String functionName,
+        final String fileName,
+        final int beginLine,
+        final int beginColumn,
+        final String id,
+        final String message,
+        final boolean hit
+    ) {
+        ObjectNode guidanceData = null;
+        if (hit) {
+            double dLeft = left.doubleValue();
+            double dRight = right.doubleValue();
+            if (!Guidance.shouldEmitNumeric(dLeft, dRight, maximize, id)) {
+                return;
+            }
+            guidanceData = MAPPER.createObjectNode();
+            guidanceData.set("left", MAPPER.valueToTree(dLeft));
+            guidanceData.set("right", MAPPER.valueToTree(dRight));
+        }
+
+        LocationInfo location = LocationInfo.builder()
+                .beginColumn(beginColumn)
+                .beginLine(beginLine)
+                .className(className)
+                .fileName(fileName)
+                .functionName(functionName)
+                .build();
+        Guidance.builder()
+                .guidanceType(GuidanceType.Numeric)
+                .id(id)
+                .message(message)
+                .location(location)
+                .maximize(maximize)
+                .data(guidanceData)
+                .hit(hit)
+                .build()
+                .emit();
     }
 
     private static void guidanceHelper(
@@ -335,6 +420,9 @@ final public class Assert {
         final boolean maximize,
         final String message
     ) {
+        if (!Guidance.shouldEmit(guidanceType, guidanceData, maximize, message, true)) {
+            return;
+        }
         Guidance.builder()
                 .guidanceType(guidanceType)
                 .id(message)
@@ -344,7 +432,30 @@ final public class Assert {
                 .data(guidanceData)
                 .hit(true)
                 .build()
-                .trackEntry();
+                .emit();
+    }
+
+    private static void numericHelper(final AssertType assertType, final boolean condition,
+                                      final double left, final double right, final boolean maximize,
+                                      final String message, final ObjectNode details) {
+        ObjectNode guidanceData = null;
+        if (Assertion.shouldEmit(message, condition)) {
+            guidanceData = MAPPER.createObjectNode().put("left", left).put("right", right);
+            Assertion.builder().assertType(assertType).condition(condition)
+                    .details(details).guidanceDetails(guidanceData).displayType(assertType.name())
+                    .hit(true).id(message).location(Assertion.getLocationInfo(message))
+                    .message(message).mustHit(true).build().emit();
+        }
+        // Guidance has its own gate: a suppressed assertion can still improve
+        // the watermark, and a new assertion outcome need not improve it.
+        if (Guidance.shouldEmitNumeric(left, right, maximize, message)) {
+            if (guidanceData == null) {
+                guidanceData = MAPPER.createObjectNode().put("left", left).put("right", right);
+            }
+            Guidance.builder().guidanceType(GuidanceType.Numeric).id(message).message(message)
+                    .location(Assertion.getLocationInfo(message)).maximize(maximize)
+                    .data(guidanceData).hit(true).build().emit();
+        }
     }
 
     /**
@@ -366,10 +477,8 @@ final public class Assert {
     public static <T extends Number> void alwaysGreaterThan(final T left, final T right, final String message, final ObjectNode details) {
         double leftValue = left.doubleValue();
         double rightValue = right.doubleValue();
-        ObjectNode guidanceData = MAPPER.createObjectNode().put("left", leftValue).put("right", rightValue);
-        ObjectNode detailsExtended = mergeGuidance(details, guidanceData);
-        alwaysHelper(leftValue > rightValue, message, detailsExtended);
-        guidanceHelper(GuidanceType.Numeric, guidanceData, false, message);
+        numericHelper(AssertType.Always, leftValue > rightValue,
+                leftValue, rightValue, false, message, details);
     }
 
     /**
@@ -391,10 +500,8 @@ final public class Assert {
     public static <T extends Number> void alwaysGreaterThanOrEqualTo(final T left, final T right, final String message, final ObjectNode details) {
         double leftValue = left.doubleValue();
         double rightValue = right.doubleValue();
-        ObjectNode guidanceData = MAPPER.createObjectNode().put("left", leftValue).put("right", rightValue);
-        ObjectNode detailsExtended = mergeGuidance(details, guidanceData);
-        alwaysHelper(leftValue >= rightValue, message, detailsExtended);
-        guidanceHelper(GuidanceType.Numeric, guidanceData, false, message);
+        numericHelper(AssertType.Always, leftValue >= rightValue,
+                leftValue, rightValue, false, message, details);
     }
 
     /**
@@ -416,10 +523,8 @@ final public class Assert {
     public static <T extends Number> void alwaysLessThan(final T left, final T right, final String message, final ObjectNode details) {
         double leftValue = left.doubleValue();
         double rightValue = right.doubleValue();
-        ObjectNode guidanceData = MAPPER.createObjectNode().put("left", leftValue).put("right", rightValue);
-        ObjectNode detailsExtended = mergeGuidance(details, guidanceData);
-        alwaysHelper(leftValue < rightValue, message, detailsExtended);
-        guidanceHelper(GuidanceType.Numeric, guidanceData, true, message);
+        numericHelper(AssertType.Always, leftValue < rightValue,
+                leftValue, rightValue, true, message, details);
     }
 
     /**
@@ -441,10 +546,8 @@ final public class Assert {
     public static <T extends Number> void alwaysLessThanOrEqualTo(final T left, final T right, final String message, final ObjectNode details) {
         double leftValue = left.doubleValue();
         double rightValue = right.doubleValue();
-        ObjectNode guidanceData = MAPPER.createObjectNode().put("left", leftValue).put("right", rightValue);
-        ObjectNode detailsExtended = mergeGuidance(details, guidanceData);
-        alwaysHelper(leftValue <= rightValue, message, detailsExtended);
-        guidanceHelper(GuidanceType.Numeric, guidanceData, true, message);
+        numericHelper(AssertType.Always, leftValue <= rightValue,
+                leftValue, rightValue, true, message, details);
     }
 
     /**
@@ -466,10 +569,8 @@ final public class Assert {
     public static <T extends Number> void sometimesGreaterThan(final T left, final T right, final String message, final ObjectNode details) {
         double leftValue = left.doubleValue();
         double rightValue = right.doubleValue();
-        ObjectNode guidanceData = MAPPER.createObjectNode().put("left", leftValue).put("right", rightValue);
-        ObjectNode detailsExtended = mergeGuidance(details, guidanceData);
-        sometimesHelper(leftValue > rightValue, message, detailsExtended);
-        guidanceHelper(GuidanceType.Numeric, guidanceData, true, message);
+        numericHelper(AssertType.Sometimes, leftValue > rightValue,
+                leftValue, rightValue, true, message, details);
     }
 
     /**
@@ -491,10 +592,8 @@ final public class Assert {
     public static <T extends Number> void sometimesGreaterThanOrEqualTo(final T left, final T right, final String message, final ObjectNode details) {
         double leftValue = left.doubleValue();
         double rightValue = right.doubleValue();
-        ObjectNode guidanceData = MAPPER.createObjectNode().put("left", leftValue).put("right", rightValue);
-        ObjectNode detailsExtended = mergeGuidance(details, guidanceData);
-        sometimesHelper(leftValue >= rightValue, message, detailsExtended);
-        guidanceHelper(GuidanceType.Numeric, guidanceData, true, message);
+        numericHelper(AssertType.Sometimes, leftValue >= rightValue,
+                leftValue, rightValue, true, message, details);
     }
 
     /**
@@ -516,10 +615,8 @@ final public class Assert {
     public static <T extends Number> void sometimesLessThan(final T left, final T right, final String message, final ObjectNode details) {
         double leftValue = left.doubleValue();
         double rightValue = right.doubleValue();
-        ObjectNode guidanceData = MAPPER.createObjectNode().put("left", leftValue).put("right", rightValue);
-        ObjectNode detailsExtended = mergeGuidance(details, guidanceData);
-        sometimesHelper(leftValue < rightValue, message, detailsExtended);
-        guidanceHelper(GuidanceType.Numeric, guidanceData, false, message);
+        numericHelper(AssertType.Sometimes, leftValue < rightValue,
+                leftValue, rightValue, false, message, details);
     }
 
     /**
@@ -541,10 +638,8 @@ final public class Assert {
     public static <T extends Number> void sometimesLessThanOrEqualTo(final T left, final T right, final String message, final ObjectNode details) {
         double leftValue = left.doubleValue();
         double rightValue = right.doubleValue();
-        ObjectNode guidanceData = MAPPER.createObjectNode().put("left", leftValue).put("right", rightValue);
-        ObjectNode detailsExtended = mergeGuidance(details, guidanceData);
-        sometimesHelper(leftValue <= rightValue, message, detailsExtended);
-        guidanceHelper(GuidanceType.Numeric, guidanceData, false, message);
+        numericHelper(AssertType.Sometimes, leftValue <= rightValue,
+                leftValue, rightValue, false, message, details);
     }
 
     /**
@@ -569,8 +664,7 @@ final public class Assert {
     public static void alwaysSome(final Map<String, Boolean> conditions, final String message, final ObjectNode details) {
         ObjectNode guidanceData = MAPPER.createObjectNode();
         conditions.forEach(guidanceData::put);
-        ObjectNode detailsExtended = mergeGuidance(details, guidanceData);
-        alwaysHelper(conditions.containsValue(true), message, detailsExtended);
+        alwaysHelper(conditions.containsValue(true), message, details, guidanceData);
         guidanceHelper(GuidanceType.Boolean, guidanceData, false, message);
     }
 
@@ -596,8 +690,7 @@ final public class Assert {
     public static void sometimesAll(final Map<String, Boolean> conditions, final String message, final ObjectNode details) {
         ObjectNode guidanceData = MAPPER.createObjectNode();
         conditions.forEach(guidanceData::put);
-        ObjectNode detailsExtended = mergeGuidance(details, guidanceData);
-        sometimesHelper(!conditions.containsValue(false), message, detailsExtended);
+        sometimesHelper(!conditions.containsValue(false), message, details, guidanceData);
         guidanceHelper(GuidanceType.Boolean, guidanceData, true, message);
     }
 }

@@ -1,7 +1,6 @@
 package com.antithesis.sdk.internal;
 
 import com.antithesis.ffi.internal.OutputHandler;
-import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
@@ -23,10 +22,7 @@ import java.util.concurrent.CopyOnWriteArrayList;
  */
 public final class CaptureSupport implements OutputHandler {
 
-    private static final ObjectMapper MAPPER = new ObjectMapper()
-            // The SDK writes Double.NaN / Infinity as bare NaN / Infinity tokens;
-            // allow the capturing reader to parse them back.
-            .configure(JsonParser.Feature.ALLOW_NON_NUMERIC_NUMBERS, true);
+    private static final ObjectMapper MAPPER = new ObjectMapper();
 
     private final List<JsonNode> emitted = new CopyOnWriteArrayList<>();
 
@@ -55,6 +51,7 @@ public final class CaptureSupport implements OutputHandler {
         HandlerFactory.useHandler(capture);
         Assertion.resetTracking();
         Guidance.resetTracking();
+        Internal.resetDiagnostics();
         return capture;
     }
 
@@ -65,10 +62,15 @@ public final class CaptureSupport implements OutputHandler {
     public static void uninstall() {
         Assertion.resetTracking();
         Guidance.resetTracking();
+        Internal.resetDiagnostics();
         HandlerFactory.useHandler(null);
     }
 
     // ---- queries over what was emitted ---------------------------------------
+
+    public List<JsonNode> records() {
+        return new ArrayList<>(emitted);
+    }
 
     /** The inner objects under the {@code "antithesis_assert"} wrapper key. */
     public List<JsonNode> assertions() {

@@ -1,8 +1,7 @@
 { 
   pkgs,
   gradle2nix,
-  strip_lock_hash,
-  ffi ? (import ./../ffi/default.nix { inherit pkgs gradle2nix strip_lock_hash; }).ffi
+  ffi ? (import ./../ffi/default.nix { inherit pkgs gradle2nix; }).ffi
 }:
 let
   sdk = let
@@ -17,7 +16,7 @@ let
   in (gradle2nix.buildGradlePackage {
       pname = "Antithesis Java SDK";
       version = sdk_version;
-      lockFile = strip_lock_hash ./gradle.lock;
+      lockFile = ./gradle.lock;
       gradleBuildFlags = [ "--quiet" "build" ];
       buildJdkVersion = pkgs.jdk21;
     }).overrideAttrs(_: prev: {

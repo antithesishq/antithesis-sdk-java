@@ -24,5 +24,5 @@ at runtime. Minimum versions are shown and later versions
 should work.
 
     antithesis-ffi 1.4.6 (or above)
-    jackson 2.14.0 (or above)
+    jackson 2.15.0 (or above)
 

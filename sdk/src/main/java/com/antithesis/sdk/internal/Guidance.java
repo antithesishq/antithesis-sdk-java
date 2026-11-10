@@ -6,8 +6,10 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicLong;
 
 import com.antithesis.sdk.Assert.GuidanceType;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.core.JsonGenerator;
+import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.JsonSerializer;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializerProvider;
@@ -47,7 +49,7 @@ public final class Guidance {
     final private LocationInfo location;
     @JsonProperty("maximize")
     final private boolean maximize;
-    @JsonProperty("guidance_data")
+    @JsonIgnore
     final private ObjectNode data;
     @JsonProperty("hit")
     final private boolean hit;
@@ -57,51 +59,59 @@ public final class Guidance {
         NUMERIC_TRACKERS.clear();
     }
 
-    public void trackEntry() {
-        if (!this.hit) {
-            this.emit();
-            return;
+    public static boolean shouldEmit(GuidanceType type, ObjectNode data, boolean maximize, String id, boolean hit) {
+        if (!hit || type != GuidanceType.Numeric) {
+            return true;
         }
-
-        if (this.guidanceType == GuidanceType.Numeric) {
-            NumericTrackingInfo tracker = NUMERIC_TRACKERS.computeIfAbsent(this.id, k -> new NumericTrackingInfo(this.maximize));
-            double left = data.get("left").doubleValue();
-            double right = data.get("right").doubleValue();
-            if (tracker.shouldSend(left - right)) {
-                this.emit();
-            }
-        } else {
-            this.emit();
-        }
+        JsonNode left = data == null ? null : data.get("left");
+        JsonNode right = data == null ? null : data.get("right");
+        return left == null ||
+            right == null ||
+            !left.isNumber() ||
+            !right.isNumber() ||
+            shouldEmitNumeric(left.doubleValue(), right.doubleValue(), maximize, id);
     }
 
-    private void emit() {
-        ObjectNode guidanceNode = MAPPER.createObjectNode();
-        guidanceNode.put("antithesis_guidance", MAPPER.valueToTree(this));
+    public static boolean shouldEmitNumeric(double left, double right, boolean maximize, String id) {
+        if (!Double.isFinite(left) || !Double.isFinite(right)) {
+            Internal.reportNonFiniteOperand(id);
+            return false;
+        }
+        NumericTrackingInfo tracker = NUMERIC_TRACKERS.get(id);
+        if (tracker == null) {
+            tracker = NUMERIC_TRACKERS.computeIfAbsent(id, k -> new NumericTrackingInfo(maximize));
+        }
+        return tracker.shouldSend(left - right);
+    }
 
-        Internal.dispatchOutput(guidanceNode);
+    public void emit() {
+        ObjectNode guidanceNode = MAPPER.createObjectNode();
+        ObjectNode metadata = MAPPER.valueToTree(this);
+        guidanceNode.set("antithesis_guidance", metadata);
+
+        Internal.dispatchGuidance(guidanceNode, metadata, hit ? data : null, id);
     }
 
     private static class NumericTrackingInfo {
+        // Finite operands cannot produce a NaN gap, so NaN bits stand in for unset.
+        private static final long UNSET = Double.doubleToRawLongBits(Double.NaN);
+
         private final AtomicLong markBits;
         private final boolean maximize;
 
         NumericTrackingInfo(boolean maximize) {
             this.maximize = maximize;
-            this.markBits = new AtomicLong(Double.doubleToRawLongBits(
-                    maximize ? Double.NEGATIVE_INFINITY : Double.POSITIVE_INFINITY));
+            this.markBits = new AtomicLong(UNSET);
         }
 
         boolean shouldSend(double value) {
-            // Report NaN values, but don't let them update the mark.
-            if (Double.isNaN(value)) {
-                return true;
-            }
             while (true) {
                 long currentBits = markBits.get();
-                double current = Double.longBitsToDouble(currentBits);
-                if (maximize ? (current >= value) : (current <= value)) {
-                    return false;
+                if (currentBits != UNSET) {
+                    double current = Double.longBitsToDouble(currentBits);
+                    if (maximize ? (current >= value) : (current <= value)) {
+                        return false;
+                    }
                 }
                 if (markBits.compareAndSet(currentBits, Double.doubleToRawLongBits(value))) {
                     return true;
